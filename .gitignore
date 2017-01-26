@@ -1,0 +1,5 @@
+.vscode/
+vendor/
+debug
+config.yaml
+glide.lock

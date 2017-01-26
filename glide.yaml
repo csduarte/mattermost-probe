@@ -1,0 +1,3 @@
+package: github.com/csduarte/writeResponse
+import:
+- package: gopkg.in/yaml.v2
