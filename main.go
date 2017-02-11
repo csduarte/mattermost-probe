@@ -1,39 +1,74 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/csduarte/mattermost_probe/config"
+	"github.com/csduarte/mattermost_probe/mattermost"
+	"github.com/csduarte/mattermost_probe/metrics"
+	"github.com/csduarte/mattermost_probe/probe"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
 func main() {
-	file, err := ioutil.ReadFile("./config.yaml")
+	configLocation := flag.String("config", "./config.yaml", "Config location")
+	flag.Parse()
+
+	file, err := ioutil.ReadFile(*configLocation)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		applicationExit("Config error - " + err.Error())
 	}
-	cfg := Config{}
+	cfg := config.Config{}
 	yaml.Unmarshal(file, &cfg)
 
-	var clients []*apiClient
-	for _, h := range cfg.Hosts {
-		fmt.Printf("Creating client for %v\n", h)
-		c := NewAPIClient(h)
-		c.ChannelID = cfg.ChannelID
-		c.TeamID = cfg.TeamID
-
-		clients = append(clients, c)
-
-		if err = c.Login(cfg.Username, cfg.Password); err != nil {
-			fmt.Printf("Failed login: %v\n", err.Error())
-			os.Exit(1)
-		}
-
-		wc := NewWriteCheck(c)
-		wc.Start()
+	if err := cfg.Validate(); err != nil {
+		applicationExit("Config error - " + err.Error())
 	}
 
+	server := metrics.NewServer()
+
+	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
+	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
+
+	// Need real urls
+	if err := userA.Establish(cfg.WSHost, cfg.UserA); err != nil {
+		applicationExit("Could not establish user A - " + err.Error())
+	}
+
+	if err := userB.Establish(cfg.WSHost, cfg.UserB); err != nil {
+		applicationExit("Could not establish user B - " + err.Error())
+	}
+
+	probes := []probe.Probe{}
+
+	if cfg.BroadcastProbe.Enabled {
+		bp := probe.NewBroadcastProbe(&cfg.BroadcastProbe, userA, userB)
+		probes = append(probes, bp)
+	}
+
+	for _, p := range probes {
+		if err := p.Setup(); err != nil {
+			// TODO: Need a probe get name function
+			applicationExit("Could not setup probe - " + err.Error())
+		}
+	}
+
+	for _, p := range probes {
+		if err := p.Start(); err != nil {
+			// TODO: Need a probe get name function
+			applicationExit("Could not start probe - " + err.Error())
+		}
+	}
+
+	fmt.Println("Inital Setup Complete")
 	select {}
+}
+
+func applicationExit(msg string) {
+	fmt.Println("Application Error - ", msg)
+	os.Exit(1)
 }

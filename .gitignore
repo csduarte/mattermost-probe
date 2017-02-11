@@ -2,4 +2,7 @@
 vendor/
 debug
 config.yaml
+config_stage.yaml
+xconfig_stage.yaml
 glide.lock
+mattermost_probe
