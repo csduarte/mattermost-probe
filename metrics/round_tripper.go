@@ -28,8 +28,9 @@ func (trt *TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error)
 	requestEnd := time.Now()
 
 	trt.reportChannel <- TimingReport{
+		"",
 		r.URL.Path,
-		requestEnd.Sub(requestStart),
+		requestEnd.Sub(requestStart).Seconds(),
 	}
 
 	return resp, err

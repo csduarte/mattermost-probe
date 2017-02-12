@@ -1,11 +1,10 @@
 package metrics
 
-import "time"
-
 // TimingReport holds metric name and request duration
 type TimingReport struct {
+	MetricName      string
 	Path            string
-	RequestDuration time.Duration
+	DurationSeconds float64
 }
 
 // TimingChannel reprsents an incoming report channel

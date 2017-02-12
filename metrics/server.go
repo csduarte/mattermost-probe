@@ -3,6 +3,8 @@ package metrics
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Server respresents the Prometheus metrics and incoming channel
@@ -22,7 +24,10 @@ func NewServer() *Server {
 
 // Listen starts the prometheus server
 func (s *Server) Listen() {
-	// http.Handle("/metrics", prometheus.Handler())
+	for _, m := range Metrics {
+		prometheus.MustRegister(m)
+	}
+	http.Handle("/metrics", prometheus.Handler())
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -38,10 +43,19 @@ func (s *Server) MonitorTimingReports() {
 
 // HandleReport will process incoming timing reports
 func (s *Server) HandleReport(r TimingReport) {
-	mn, ok := LookupMetricNameByPath(r.Path)
-	if ok {
-		fmt.Printf("%v, %v", mn, r.RequestDuration)
-	} else {
-		fmt.Printf("WARNING: Failed to find metric by path %v\n", r.Path)
+	if len(r.MetricName) == 0 {
+		mn, ok := LookupMetricNameByPath(r.Path)
+		if !ok {
+			fmt.Printf("WARNING: Failed to find metric by path %v\n", r.Path)
+			return
+		}
+		r.MetricName = mn
 	}
+	metric, ok := Metrics[r.MetricName]
+	if !ok {
+		fmt.Printf("WARNING: Failed to find metric by name %v\n", r.MetricName)
+		return
+	}
+	fmt.Println(r.MetricName, ": ", r.DurationSeconds)
+	metric.Set(r.DurationSeconds)
 }

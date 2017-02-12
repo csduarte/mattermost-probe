@@ -30,6 +30,7 @@ func main() {
 	}
 
 	server := metrics.NewServer()
+	go server.Listen()
 
 	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
 	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
@@ -47,6 +48,7 @@ func main() {
 
 	if cfg.BroadcastProbe.Enabled {
 		bp := probe.NewBroadcastProbe(&cfg.BroadcastProbe, userA, userB)
+		bp.TimingChannel = server.ReportChannel
 		probes = append(probes, bp)
 	}
 

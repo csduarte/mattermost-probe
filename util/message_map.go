@@ -7,24 +7,24 @@ import (
 
 // MessageMap will syncronize multireads and writes of message times
 type MessageMap struct {
-	Items map[string]int64
+	Items map[string]time.Time
 	sync.RWMutex
 }
 
 // NewMessageMap returns a fresh message map
 func NewMessageMap() *MessageMap {
-	return &MessageMap{map[string]int64{}, sync.RWMutex{}}
+	return &MessageMap{map[string]time.Time{}, sync.RWMutex{}}
 }
 
 // Add will insert an item into the message map
-func (mm *MessageMap) Add(guid string, t int64) {
+func (mm *MessageMap) Add(guid string, t time.Time) {
 	mm.Lock()
 	defer mm.Unlock()
 	mm.Items[guid] = t
 }
 
 // Get will get the key and pass a bool back if it was found
-func (mm *MessageMap) Get(key string) (int64, bool) {
+func (mm *MessageMap) Get(key string) (time.Time, bool) {
 	mm.RLock()
 	defer mm.RUnlock()
 	val, ok := mm.Items[key]
@@ -32,7 +32,7 @@ func (mm *MessageMap) Get(key string) (int64, bool) {
 }
 
 // Delete reoves key if can be found, otherwise returns false
-func (mm *MessageMap) Delete(key string) (int64, bool) {
+func (mm *MessageMap) Delete(key string) (time.Time, bool) {
 	mm.Lock()
 	defer mm.Unlock()
 	start, ok := mm.Items[key]
@@ -40,16 +40,16 @@ func (mm *MessageMap) Delete(key string) (int64, bool) {
 		delete(mm.Items, key)
 		return start, true
 	}
-	return 0, false
+	return time.Time{}, false
 }
 
 // FistOverdue will return if it finds any message beyond cutoff
-func (mm *MessageMap) FistOverdue(cutoff int64) (string, int64) {
+func (mm *MessageMap) FistOverdue(cutoff time.Duration) (string, time.Duration) {
 	mm.RLock()
 	defer mm.RUnlock()
-	now := time.Now().UnixNano() / 1000000
+	now := time.Now()
 	for id, start := range mm.Items {
-		delay := now - start
+		delay := now.Sub(start)
 		if delay >= cutoff {
 			return id, delay
 		}
@@ -61,5 +61,5 @@ func (mm *MessageMap) FistOverdue(cutoff int64) (string, int64) {
 func (mm *MessageMap) Empty() {
 	mm.Lock()
 	defer mm.Unlock()
-	mm.Items = map[string]int64{}
+	mm.Items = map[string]time.Time{}
 }

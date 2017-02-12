@@ -7,6 +7,7 @@ import (
 
 	"github.com/csduarte/mattermost_probe/config"
 	"github.com/csduarte/mattermost_probe/mattermost"
+	"github.com/csduarte/mattermost_probe/metrics"
 	"github.com/csduarte/mattermost_probe/util"
 	"github.com/mattermost/platform/model"
 	uuid "github.com/satori/go.uuid"
@@ -14,13 +15,14 @@ import (
 
 // BroadcastProbe represents a test where the speaker will broadcast unique messages and the listener will check broadcast time.
 type BroadcastProbe struct {
-	Speaker      *mattermost.Client
-	Listener     *mattermost.Client
-	Config       *config.BroadcastConfig
-	Messages     *util.MessageMap
-	EventChannel chan *model.WebSocketEvent
-	StopChannel  chan bool
-	Active       bool
+	Speaker       *mattermost.Client
+	Listener      *mattermost.Client
+	Config        *config.BroadcastConfig
+	Messages      *util.MessageMap
+	EventChannel  chan *model.WebSocketEvent
+	TimingChannel metrics.TimingChannel
+	StopChannel   chan bool
+	Active        bool
 }
 
 // NewBroadcastProbe creates a new base probe
@@ -31,6 +33,7 @@ func NewBroadcastProbe(c *config.BroadcastConfig, s, l *mattermost.Client) *Broa
 		c,
 		util.NewMessageMap(),
 		make(chan *model.WebSocketEvent, 10),
+		nil,
 		make(chan bool),
 		false,
 	}
@@ -84,6 +87,7 @@ func (bp *BroadcastProbe) Start() error {
 		}
 	}()
 
+	bp.Active = true
 	return nil
 }
 
@@ -91,12 +95,12 @@ func (bp *BroadcastProbe) Start() error {
 func (bp *BroadcastProbe) SendWrite() {
 	p := &model.Post{}
 	uid := uuid.NewV4().String()
-	sentAt := time.Now().UnixNano() / 1000000
+	sentAt := time.Now()
 	bp.Messages.Add(uid, sentAt)
 	p.ChannelId = bp.Config.ChannelID
 	p.UserId = bp.Speaker.User.Id
 	p.Message = uid
-	fmt.Println("DEBUG: Sent Message at", time.Now())
+	// fmt.Println("DEBUG: Sent Message at", time.Now())
 	if err := bp.Speaker.CreatePost(p); err != nil {
 		fmt.Println("WARN: Error while SendWrite", err.Error())
 	}
@@ -114,12 +118,17 @@ func (bp *BroadcastProbe) listenForEvents() {
 func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	post := model.PostFromJson(strings.NewReader(event.Data["post"].(string)))
 	uid := post.Message
-	t := time.Now().UnixNano() / 1000000
-	if start, ok := bp.Messages.Delete(uid); ok {
-		resTime := t - start
-		fmt.Printf("INFO: Broadcast Message took %v ms\n", resTime)
-	} else {
+	end := time.Now()
+	start, ok := bp.Messages.Delete(uid)
+	if !ok {
 		fmt.Println("WARN: Failed to find message by uuid")
+
+	}
+	if bp.TimingChannel != nil {
+		bp.TimingChannel <- metrics.TimingReport{
+			MetricName:      metrics.MetricProbeBroadcast,
+			DurationSeconds: end.Sub(start).Seconds(),
+		}
 	}
 }
 
