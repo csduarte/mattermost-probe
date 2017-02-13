@@ -1,4 +1,4 @@
-package: github.com/csduarte/writeResponse
+package: github.com/csduarte/mattermost-probe
 import:
 - package: gopkg.in/yaml.v2
 - package: github.com/mattermost/platform
