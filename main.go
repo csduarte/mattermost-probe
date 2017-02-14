@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/csduarte/mattermost_probe/config"
-	"github.com/csduarte/mattermost_probe/mattermost"
-	"github.com/csduarte/mattermost_probe/metrics"
-	"github.com/csduarte/mattermost_probe/probe"
+	"github.com/csduarte/mattermost-probe/config"
+	"github.com/csduarte/mattermost-probe/mattermost"
+	"github.com/csduarte/mattermost-probe/metrics"
+	"github.com/csduarte/mattermost-probe/probe"
 
 	yaml "gopkg.in/yaml.v2"
 )

@@ -3,8 +3,8 @@ package mattermost
 import (
 	"fmt"
 
-	"github.com/csduarte/mattermost_probe/config"
-	"github.com/csduarte/mattermost_probe/metrics"
+	"github.com/csduarte/mattermost-probe/config"
+	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/mattermost/platform/model"
 )
 

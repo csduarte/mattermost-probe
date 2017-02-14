@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/csduarte/mattermost_probe/config"
-	"github.com/csduarte/mattermost_probe/mattermost"
-	"github.com/csduarte/mattermost_probe/metrics"
-	"github.com/csduarte/mattermost_probe/util"
+	"github.com/csduarte/mattermost-probe/config"
+	"github.com/csduarte/mattermost-probe/mattermost"
+	"github.com/csduarte/mattermost-probe/metrics"
+	"github.com/csduarte/mattermost-probe/util"
 	"github.com/mattermost/platform/model"
 	uuid "github.com/satori/go.uuid"
 )

@@ -6,4 +6,4 @@ config_stage.yaml
 xconfig_stage.yaml
 glide.lock
 .DS_Store
-mattermost_probe
+mattermost-probe
