@@ -7,6 +7,8 @@ type Config struct {
 	TeamID         string          `yaml:"team_id"`
 	Host           string          `yaml:"host"`
 	WSHost         string          `yaml:"ws_host"`
+	BindAddr       string          `yaml:"bind_address"`
+	Port           int             `yaml:"port"`
 	UserA          Credentials     `yaml:"user_a"`
 	UserB          Credentials     `yaml:"user_b"`
 	BroadcastProbe BroadcastConfig `yaml:"broadcast_config"`

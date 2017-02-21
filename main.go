@@ -5,14 +5,33 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/csduarte/mattermost-probe/config"
 	"github.com/csduarte/mattermost-probe/mattermost"
 	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/csduarte/mattermost-probe/probe"
-
 	yaml "gopkg.in/yaml.v2"
 )
+
+var logger *Logger
+var ezLog int
+
+func init() {
+
+	logger, _ := zap.NewProduction()
+	sugar := logger.Sugar()
+
+	sugar.Infow("Failed to fetch URL.",
+		// Structured context as loosely-typed key-value pairs.
+		"url", "url",
+		"attempt", "retryNum",
+		"backoff", time.Second,
+	)
+	sugar.Infof("Failed to fetch URL: %s", "https://url")
+}
 
 func main() {
 	configLocation := flag.String("config", "./config.yaml", "Config location")

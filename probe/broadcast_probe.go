@@ -137,6 +137,7 @@ func (bp *BroadcastProbe) getChannelID(name string) error {
 	if err != nil {
 		fmt.Println("Probe error", err.Error())
 	}
+
 	bp.Config.ChannelID = channel.Id
 	return nil
 }

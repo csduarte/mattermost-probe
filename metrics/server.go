@@ -23,12 +23,19 @@ func NewServer() *Server {
 }
 
 // Listen starts the prometheus server
-func (s *Server) Listen() {
+func (s *Server) Listen(address string, port int) {
+	if port == 0 {
+		port = 8067
+	}
+	if address == "" {
+		address = "0.0.0.0"
+	}
+	serverAddr := fmt.Sprintf("%s:%d", address, port)
 	for _, m := range Metrics {
 		prometheus.MustRegister(m)
 	}
 	http.Handle("/metrics", prometheus.Handler())
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(serverAddr, nil)
 }
 
 //MonitorTimingReports loops through report channel andpasses the reports to HandleReport

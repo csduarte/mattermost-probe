@@ -1,1 +1,18 @@
 # To be completed when basic config is closer to completion
+host: http://localhost:8065
+ws_host: ws://localhost:8065
+team_id: xdi6bbz8cjg5py9433q61d99iy
+bind_address: 0.0.0.0
+port: 8067
+
+user_a:
+  email: dchristopher
+  password: dchristopher
+user_b:
+  email: duarte
+  password: duarte
+
+broadcast_config:
+  enabled: true
+  frequency_ms: 2000
+  channelName: super-test #System Name, not display name
