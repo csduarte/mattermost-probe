@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/csduarte/mattermost-probe/config"
 	"github.com/csduarte/mattermost-probe/mattermost"
 	"github.com/csduarte/mattermost-probe/metrics"
@@ -102,7 +104,7 @@ func (bp *BroadcastProbe) SendWrite() {
 	p.Message = uid
 	// fmt.Println("DEBUG: Sent Message at", time.Now())
 	if err := bp.Speaker.CreatePost(p); err != nil {
-		fmt.Println("WARN: Error while SendWrite", err.Error())
+		util.LogError("Error while SendWrite", zap.String("message", err.Error()))
 	}
 }
 
@@ -121,7 +123,7 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	end := time.Now()
 	start, ok := bp.Messages.Delete(uid)
 	if !ok {
-		fmt.Println("WARN: Failed to find message by uuid")
+		util.LogError("Failed to find message by uuid")
 
 	}
 	if bp.TimingChannel != nil {
@@ -135,7 +137,7 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 func (bp *BroadcastProbe) getChannelID(name string) error {
 	channel, err := bp.Speaker.GetChannelByName(name)
 	if err != nil {
-		fmt.Println("Probe error", err.Error())
+		util.LogError("Probe error", zap.String("message", err.Error()))
 	}
 
 	bp.Config.ChannelID = channel.Id
@@ -167,7 +169,7 @@ func (bp BroadcastProbe) GetSubscription() *mattermost.WebSocketSubscription {
 // 	for {
 // 		if id, delay := bp.Messages.FistOverdue(50); delay > 0 {
 // 			bp.Messages.Delete(id)
-// 			fmt.Printf("WARN: SLOW MESAGE took %v ms", delay)
+// 			util.LogInfo("SLOW MESSAGE took %v ms", delay)
 // 			continue
 // 		}
 // 		break

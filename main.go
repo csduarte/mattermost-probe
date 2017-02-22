@@ -13,25 +13,9 @@ import (
 	"github.com/csduarte/mattermost-probe/mattermost"
 	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/csduarte/mattermost-probe/probe"
+	"github.com/csduarte/mattermost-probe/util"
 	yaml "gopkg.in/yaml.v2"
 )
-
-var logger *Logger
-var ezLog int
-
-func init() {
-
-	logger, _ := zap.NewProduction()
-	sugar := logger.Sugar()
-
-	sugar.Infow("Failed to fetch URL.",
-		// Structured context as loosely-typed key-value pairs.
-		"url", "url",
-		"attempt", "retryNum",
-		"backoff", time.Second,
-	)
-	sugar.Infof("Failed to fetch URL: %s", "https://url")
-}
 
 func main() {
 	configLocation := flag.String("config", "./config.yaml", "Config location")
@@ -49,7 +33,7 @@ func main() {
 	}
 
 	server := metrics.NewServer()
-	go server.Listen()
+	go server.Listen(cfg.BindAddr, cfg.Port)
 
 	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
 	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
@@ -85,11 +69,11 @@ func main() {
 		}
 	}
 
-	fmt.Println("Inital Setup Complete")
+	util.LogInfo("Inital Setup Complete")
 	select {}
 }
 
 func applicationExit(msg string) {
-	fmt.Println("Application Error - ", msg)
+	util.LogError("Application Error - ", zap.String("message", msg))
 	os.Exit(1)
 }
