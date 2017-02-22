@@ -1,0 +1,19 @@
+{"level":"info","ts":1487719307.778404,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:29","msg":"Log Location: %!s(*string=0xc42010be00)"}
+{"level":"info","ts":1487719340.8086586,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:29","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487720143.4160223,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:33","msg":"Application Started"}
+{"level":"info","ts":1487720143.4160867,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:34","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487729935.6955369,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:42","msg":"Application Started"}
+{"level":"info","ts":1487729935.6957874,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:43","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487729935.6958075,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:44","msg":"Config Location: ./config.yaml"}
+{"level":"info","ts":1487730027.3638706,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:42","msg":"Application Started"}
+{"level":"info","ts":1487730027.3639228,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:43","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487730027.3639302,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:44","msg":"Config Location: ./config.yaml"}
+{"level":"info","ts":1487730167.799249,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:42","msg":"Application Started"}
+{"level":"info","ts":1487730167.7993243,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:43","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487730167.7993314,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:44","msg":"Config Location: ./config.yaml"}
+{"level":"info","ts":1487730190.196653,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:42","msg":"Application Started"}
+{"level":"info","ts":1487730190.196704,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:43","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487730190.1967108,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:44","msg":"Config Location: ./config.yaml"}
+{"level":"info","ts":1487730269.3612773,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:42","msg":"Application Started"}
+{"level":"info","ts":1487730269.3613443,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:43","msg":"Log Location: ./mattermost-probe.log"}
+{"level":"info","ts":1487730269.3613558,"caller":"/Users/dchristopher/gocode/src/github.com/csduarte/mattermost-probe/main.go:44","msg":"Config Location: ./config.yaml"}

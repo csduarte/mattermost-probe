@@ -31,6 +31,7 @@ func (s *Server) Listen(address string, port int) {
 		address = "0.0.0.0"
 	}
 	serverAddr := fmt.Sprintf("%s:%d", address, port)
+	fmt.Println("serverAddr:", serverAddr)
 	for _, m := range Metrics {
 		prometheus.MustRegister(m)
 	}

@@ -12,3 +12,7 @@ import:
   subpackages:
   - prometheus
 - package: github.com/prometheus/common
+- package: go.uber.org/zap
+  version: ^1.0.0-rc.1
+- package: go.uber.org/atomic
+  version: ^1.0.0

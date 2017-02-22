@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"time"
 
 	"go.uber.org/zap"
 
@@ -16,28 +15,39 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-var logger *Logger
-var ezLog int
-
-func init() {
-
-	logger, _ := zap.NewProduction()
-	sugar := logger.Sugar()
-
-	sugar.Infow("Failed to fetch URL.",
-		// Structured context as loosely-typed key-value pairs.
-		"url", "url",
-		"attempt", "retryNum",
-		"backoff", time.Second,
-	)
-	sugar.Infof("Failed to fetch URL: %s", "https://url")
-}
+var log *zap.SugaredLogger
+var metricLog *zap.SugaredLogger
 
 func main() {
-	configLocation := flag.String("config", "./config.yaml", "Config location")
+	configLocation := *flag.String("config",
+		"./config.yaml",
+		"Config location")
+	logLocation := *flag.String("log",
+		"./mattermost-probe.log",
+		"Log Location, default")
+	outputLocation := *flag.String("output",
+		"",
+		"Location for metric logs")
 	flag.Parse()
 
-	file, err := ioutil.ReadFile(*configLocation)
+	// Standard Logs
+	logConfig := zap.NewProductionConfig()
+	level := zap.NewAtomicLevel()
+	level.SetLevel(zap.DebugLevel)
+	logConfig.Level = level
+	logConfig.OutputPaths = append(logConfig.OutputPaths, logLocation)
+	logger, _ := logConfig.Build()
+	log = logger.Sugar()
+
+	log.Infof("Application Started")
+	log.Infof("Log Location: %s", logLocation)
+	log.Infof("Config Location: %s", configLocation)
+
+	if len(outputLocation) > 0 {
+		//init metrics logger
+	}
+
+	file, err := ioutil.ReadFile(configLocation)
 	if err != nil {
 		applicationExit("Config error - " + err.Error())
 	}
@@ -49,7 +59,7 @@ func main() {
 	}
 
 	server := metrics.NewServer()
-	go server.Listen()
+	go server.Listen(cfg.BindAddr, cfg.Port)
 
 	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
 	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
