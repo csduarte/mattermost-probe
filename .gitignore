@@ -7,3 +7,4 @@ xconfig_stage.yaml
 glide.lock
 .DS_Store
 mattermost-probe
+mattermost-probe.log

@@ -12,39 +12,32 @@ import (
 	"github.com/csduarte/mattermost-probe/mattermost"
 	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/csduarte/mattermost-probe/probe"
+	"github.com/csduarte/mattermost-probe/util"
 	yaml "gopkg.in/yaml.v2"
 )
 
 var log *zap.SugaredLogger
-var metricLog *zap.SugaredLogger
+var output *zap.SugaredLogger
 
 func main() {
-	configLocation := *flag.String("config",
-		"./config.yaml",
-		"Config location")
-	logLocation := *flag.String("log",
-		"./mattermost-probe.log",
-		"Log Location, default")
-	outputLocation := *flag.String("output",
-		"",
-		"Location for metric logs")
+
+	configLocation := *flag.String("config", "./config.yaml", "Config location")
+	logLocation := *flag.String("log", "./mattermost-probe.log", "Log Location, default")
+	outputLocation := *flag.String("output", "", "Location for metric logs")
 	flag.Parse()
 
-	// Standard Logs
-	logConfig := zap.NewProductionConfig()
-	level := zap.NewAtomicLevel()
-	level.SetLevel(zap.DebugLevel)
-	logConfig.Level = level
-	logConfig.OutputPaths = append(logConfig.OutputPaths, logLocation)
-	logger, _ := logConfig.Build()
-	log = logger.Sugar()
+	log, err := util.NewEasyLogger(logLocation)
+	if err != nil {
+		applicationExit(fmt.Sprintf("Failed to create logger - %s", err.Error()))
+	}
 
 	log.Infof("Application Started")
-	log.Infof("Log Location: %s", logLocation)
 	log.Infof("Config Location: %s", configLocation)
+	log.Infof("Log Location: %s", logLocation)
+	log.Infof("Ouptut Locaitn: %s", outputLocation)
 
 	if len(outputLocation) > 0 {
-		//init metrics logger
+		// TODO: init metrics logger
 	}
 
 	file, err := ioutil.ReadFile(configLocation)
@@ -58,7 +51,7 @@ func main() {
 		applicationExit("Config error - " + err.Error())
 	}
 
-	server := metrics.NewServer()
+	server := metrics.NewServer(log, outputLocation)
 	go server.Listen(cfg.BindAddr, cfg.Port)
 
 	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
@@ -95,11 +88,11 @@ func main() {
 		}
 	}
 
-	fmt.Println("Inital Setup Complete")
+	log.Info("Startup Complete")
 	select {}
 }
 
 func applicationExit(msg string) {
-	fmt.Println("Application Error - ", msg)
+	log.Errorf(msg)
 	os.Exit(1)
 }

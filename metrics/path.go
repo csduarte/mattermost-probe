@@ -17,9 +17,6 @@ var rawSubstitutions = map[string]string{
 	"/teams/tid/": "/teams/[a-z0-9]{26}/", //Team ID
 }
 
-// Subtitutions holds the compiled regex
-var Subtitutions = map[string]*regexp.Regexp{}
-
 // MetricNamesByCommonPath allows lookup of metric name by path
 var MetricNamesByCommonPath = map[string]string{
 	"/general/ping":                        MetricAPIGeneralPing,
@@ -28,6 +25,9 @@ var MetricNamesByCommonPath = map[string]string{
 	"/teams/tid/channels/cid/join":         MetricAPIChannelJoin,
 	"/teams/tid/channels/cid/posts/create": MetricAPIPostCreate,
 }
+
+// Subtitutions holds the compiled regex
+var Subtitutions = map[string]*regexp.Regexp{}
 
 func init() {
 	for k, v := range rawSubstitutions {

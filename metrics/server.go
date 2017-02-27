@@ -5,19 +5,33 @@ import (
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
 // Server respresents the Prometheus metrics and incoming channel
 type Server struct {
 	ReportChannel TimingChannel
+	Log           *zap.SugaredLogger
+	Output        *zap.Logger
 }
 
 // NewServer returns a new metric server that is ready
-func NewServer() *Server {
+func NewServer(log *zap.SugaredLogger, outputLocation string) *Server {
 	tr := make(chan TimingReport)
+	var output *zap.Logger
+	var err error
+	if len(outputLocation) > 0 {
+		output, err = NewMetricOutput(outputLocation)
+		if err != nil {
+			log.Error("Metrics output logger failed to initialize")
+		}
+	}
 	s := &Server{
 		tr,
+		log,
+		output,
 	}
+	s.Output = output
 	go s.MonitorTimingReports()
 	return s
 }
@@ -31,7 +45,7 @@ func (s *Server) Listen(address string, port int) {
 		address = "0.0.0.0"
 	}
 	serverAddr := fmt.Sprintf("%s:%d", address, port)
-	fmt.Println("serverAddr:", serverAddr)
+	s.LogInfo("serverAddr:", serverAddr)
 	for _, m := range Metrics {
 		prometheus.MustRegister(m)
 	}
@@ -54,16 +68,40 @@ func (s *Server) HandleReport(r TimingReport) {
 	if len(r.MetricName) == 0 {
 		mn, ok := LookupMetricNameByPath(r.Path)
 		if !ok {
-			fmt.Printf("WARNING: Failed to find metric by path %v\n", r.Path)
+			s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
 			return
 		}
 		r.MetricName = mn
 	}
 	metric, ok := Metrics[r.MetricName]
 	if !ok {
-		fmt.Printf("WARNING: Failed to find metric by name %v\n", r.MetricName)
+		s.LogWarn("HandleReport - Failed to find metric by name %v\n", r.MetricName)
 		return
 	}
-	fmt.Println(r.MetricName, ": ", r.DurationSeconds)
 	metric.Set(r.DurationSeconds)
+	s.LogDebug("Metric (%s) => %s", r.MetricName, r.DurationSeconds)
+	if s.Output != nil {
+		s.Output.Info("metric", zap.Object("report", r))
+	}
+}
+
+// LogInfo is a shortcut for logging if the log exists
+func (s *Server) LogInfo(template string, items ...interface{}) {
+	if s.Log != nil {
+		s.Log.Infof(template, items)
+	}
+}
+
+// LogWarn is a shortcut for logging if the log exists
+func (s *Server) LogWarn(template string, items ...interface{}) {
+	if s.Log != nil {
+		s.Log.Warnf(template, items)
+	}
+}
+
+// LogDebug is a shortcut for logging if the log exists
+func (s *Server) LogDebug(template string, items ...interface{}) {
+	if s.Log != nil {
+		s.Log.Infof(template, items)
+	}
 }
