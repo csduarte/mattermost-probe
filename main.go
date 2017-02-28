@@ -2,12 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 
-	"go.uber.org/zap"
-
+	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
 	"github.com/csduarte/mattermost-probe/mattermost"
 	"github.com/csduarte/mattermost-probe/metrics"
@@ -16,29 +14,23 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-var log *zap.SugaredLogger
-var output *zap.SugaredLogger
+var log *logrus.Logger
 
 func main() {
-
-	configLocation := *flag.String("config", "./config.yaml", "Config location")
-	logLocation := *flag.String("log", "./mattermost-probe.log", "Log Location, default")
-	outputLocation := *flag.String("output", "", "Location for metric logs")
+	var configLocation, logLocation, outputLocation string
+	var verbose bool
+	flag.StringVar(&configLocation, "config", "./config.yaml", "Config location")
+	flag.StringVar(&logLocation, "log", "./mattermost-probe.log", "Log Location, default")
+	flag.StringVar(&outputLocation, "output", "", "Location for metric logs")
+	flag.BoolVar(&verbose, "verbose", false, "Set Log level to debug")
 	flag.Parse()
 
-	log, err := util.NewEasyLogger(logLocation)
-	if err != nil {
-		applicationExit(fmt.Sprintf("Failed to create logger - %s", err.Error()))
-	}
+	log = util.NewFileLogger(logLocation, verbose)
 
 	log.Infof("Application Started")
 	log.Infof("Config Location: %s", configLocation)
 	log.Infof("Log Location: %s", logLocation)
-	log.Infof("Ouptut Locaitn: %s", outputLocation)
-
-	if len(outputLocation) > 0 {
-		// TODO: init metrics logger
-	}
+	log.Infof("Ouptut Location: %s", outputLocation)
 
 	file, err := ioutil.ReadFile(configLocation)
 	if err != nil {
@@ -54,8 +46,8 @@ func main() {
 	server := metrics.NewServer(log, outputLocation)
 	go server.Listen(cfg.BindAddr, cfg.Port)
 
-	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
-	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel)
+	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel, log)
+	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel, log)
 
 	// Need real urls
 	if err := userA.Establish(cfg.WSHost, cfg.UserA); err != nil {
@@ -88,7 +80,7 @@ func main() {
 		}
 	}
 
-	log.Info("Startup Complete")
+	log.Info("All probes established & started")
 	select {}
 }
 

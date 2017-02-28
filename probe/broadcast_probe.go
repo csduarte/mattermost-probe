@@ -100,9 +100,8 @@ func (bp *BroadcastProbe) SendWrite() {
 	p.ChannelId = bp.Config.ChannelID
 	p.UserId = bp.Speaker.User.Id
 	p.Message = uid
-	// fmt.Println("DEBUG: Sent Message at", time.Now())
 	if err := bp.Speaker.CreatePost(p); err != nil {
-		fmt.Println("WARN: Error while SendWrite", err.Error())
+		bp.Speaker.LogError("Error while SendWrite", err.Error())
 	}
 }
 
@@ -121,8 +120,7 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	end := time.Now()
 	start, ok := bp.Messages.Delete(uid)
 	if !ok {
-		fmt.Println("WARN: Failed to find message by uuid")
-
+		bp.Speaker.LogError("Failed to find message by uuid")
 	}
 	if bp.TimingChannel != nil {
 		bp.TimingChannel <- metrics.TimingReport{
@@ -135,7 +133,7 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 func (bp *BroadcastProbe) getChannelID(name string) error {
 	channel, err := bp.Speaker.GetChannelByName(name)
 	if err != nil {
-		fmt.Println("Probe error", err.Error())
+		bp.Speaker.LogError("Probe error", err.Error())
 	}
 
 	bp.Config.ChannelID = channel.Id

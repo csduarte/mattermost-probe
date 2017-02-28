@@ -3,6 +3,7 @@ package mattermost
 import (
 	"fmt"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
 	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/mattermost/platform/model"
@@ -14,15 +15,17 @@ type Client struct {
 	WS   *model.WebSocketClient
 	User *model.User
 	Subs []*WebSocketSubscription
+	Log  *logrus.Logger
 }
 
 // NewClient generateds a new API and WebSocket Client}
-func NewClient(url, teamID string, tc metrics.TimingChannel) *Client {
+func NewClient(url, teamID string, tc metrics.TimingChannel, log *logrus.Logger) *Client {
 	c := Client{
 		model.NewClient(url),
 		nil,
 		nil,
 		[]*WebSocketSubscription{},
+		log,
 	}
 	c.API.TeamId = teamID
 	if tc != nil {

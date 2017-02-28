@@ -4,34 +4,32 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/csduarte/mattermost-probe/util"
 	"github.com/prometheus/client_golang/prometheus"
-	"go.uber.org/zap"
 )
 
 // Server respresents the Prometheus metrics and incoming channel
 type Server struct {
 	ReportChannel TimingChannel
-	Log           *zap.SugaredLogger
-	Output        *zap.Logger
+	Log           *logrus.Logger
+	Output        *logrus.Logger
 }
 
 // NewServer returns a new metric server that is ready
-func NewServer(log *zap.SugaredLogger, outputLocation string) *Server {
+func NewServer(log *logrus.Logger, outputLocation string) *Server {
 	tr := make(chan TimingReport)
-	var output *zap.Logger
-	var err error
+
+	var output *logrus.Logger
 	if len(outputLocation) > 0 {
-		output, err = NewMetricOutput(outputLocation)
-		if err != nil {
-			log.Error("Metrics output logger failed to initialize")
-		}
+		output = util.NewFileLogger(outputLocation, false)
 	}
+
 	s := &Server{
 		tr,
 		log,
 		output,
 	}
-	s.Output = output
 	go s.MonitorTimingReports()
 	return s
 }
@@ -45,7 +43,7 @@ func (s *Server) Listen(address string, port int) {
 		address = "0.0.0.0"
 	}
 	serverAddr := fmt.Sprintf("%s:%d", address, port)
-	s.LogInfo("serverAddr:", serverAddr)
+	s.LogInfo("Server Started", serverAddr)
 	for _, m := range Metrics {
 		prometheus.MustRegister(m)
 	}
@@ -79,16 +77,18 @@ func (s *Server) HandleReport(r TimingReport) {
 		return
 	}
 	metric.Set(r.DurationSeconds)
-	s.LogDebug("Metric (%s) => %s", r.MetricName, r.DurationSeconds)
 	if s.Output != nil {
-		s.Output.Info("metric", zap.Object("report", r))
+		s.Output.WithFields(logrus.Fields{
+			"Metric":   r.MetricName,
+			"Duration": r.DurationSeconds,
+		}).Info("metric")
 	}
 }
 
 // LogInfo is a shortcut for logging if the log exists
-func (s *Server) LogInfo(template string, items ...interface{}) {
+func (s *Server) LogInfo(items ...interface{}) {
 	if s.Log != nil {
-		s.Log.Infof(template, items)
+		s.Log.Info(items)
 	}
 }
 

@@ -26,11 +26,16 @@ func (trt *TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error)
 	requestStart := time.Now()
 	resp, err := trt.baseRoundTripper.RoundTrip(r)
 	requestEnd := time.Now()
+	requestDuration := requestEnd.Sub(requestStart).Seconds()
+
+	if err != nil || resp.StatusCode >= 400 {
+		requestDuration = 0
+	}
 
 	trt.reportChannel <- TimingReport{
 		"",
 		r.URL.Path,
-		requestEnd.Sub(requestStart).Seconds(),
+		requestDuration,
 	}
 
 	return resp, err
