@@ -18,8 +18,9 @@ type Server struct {
 
 // NewServer returns a new metric server that is ready
 func NewServer(log *logrus.Logger, outputLocation string) *Server {
-	tr := make(chan TimingReport)
+	tr := make(chan TimingReport, 100)
 
+	// TODO: Move Main Logger for debugger
 	var output *logrus.Logger
 	if len(outputLocation) > 0 {
 		output = util.NewFileLogger(outputLocation, false)

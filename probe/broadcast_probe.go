@@ -151,6 +151,7 @@ func (bp *BroadcastProbe) ensureMembership(c *mattermost.Client) error {
 // GetSubscription adheres to SubscriptionProbe from mattermost subpackag
 func (bp BroadcastProbe) GetSubscription() *mattermost.WebSocketSubscription {
 	wss := mattermost.NewWebsocketSubcription(bp.EventChannel)
+	// TODO: Create append helper functions
 	wss.UserIDs = append(wss.UserIDs, bp.Speaker.User.Id)
 	wss.ChannelIDs = append(wss.ChannelIDs, bp.Config.ChannelID)
 	wss.EventTypes = append(wss.EventTypes, model.WEBSOCKET_EVENT_POSTED)

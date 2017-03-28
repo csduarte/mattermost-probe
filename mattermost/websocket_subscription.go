@@ -35,9 +35,10 @@ func (wss *WebSocketSubscription) Emit(event *model.WebSocketEvent) {
 // ShouldNotify returns true if the event matches the subscription in at least one way
 func (wss *WebSocketSubscription) ShouldNotify(event *model.WebSocketEvent) bool {
 	channelMatch := false
+
 	// fmt.Printf("Channels %v in %v?\n", event.Broadcast.ChannelId, wss.ChannelIDs)
 	for _, cID := range wss.ChannelIDs {
-		if cID == event.Broadcast.ChannelId {
+		if event.Broadcast != nil && cID == event.Broadcast.ChannelId {
 			channelMatch = true
 		}
 	}

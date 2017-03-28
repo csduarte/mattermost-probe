@@ -13,6 +13,7 @@ const (
 
 // Metrics holds the prometheus metrics in a map for easy lookup
 var Metrics = map[string]prometheus.Gauge{
+	// TODO: Figure out if it should be histogram or gurae
 	MetricAPIGeneralPing: prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: MetricAPIGeneralPing,
 		Help: "Response time of general ping",

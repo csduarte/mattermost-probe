@@ -31,6 +31,7 @@ func (c *Client) StartWS(url string) error {
 }
 
 func (c *Client) handleWSEvent(event *model.WebSocketEvent) {
+	// TODO: Stamp Event incoming time, instead of doing it in each probe
 	for _, wss := range c.Subs {
 		if wss.ShouldNotify(event) {
 			wss.Emit(event)
