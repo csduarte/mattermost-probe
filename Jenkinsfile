@@ -24,7 +24,7 @@ node('golang') {
 	}
 
 	stage('publish') {
-		nexusArtifactUploader artifacts: [[artifactId: 'mattermost-probe', classifier: '', file: 'mattermost-probe', type: 'bin']], credentialsId: 'nexus-deploy', groupId: 'com.github.uberdeploy.mattermost-probe', nexusUrl: 'nexus:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: ${version}
+		nexusArtifactUploader artifacts: [[artifactId: 'mattermost-probe', classifier: '', file: 'mattermost-probe', type: 'bin']], credentialsId: 'nexus-deploy', groupId: 'com.github.uberdeploy.mattermost-probe', nexusUrl: 'nexus:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: version
 	}
 }
 
