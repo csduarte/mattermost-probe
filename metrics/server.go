@@ -45,9 +45,14 @@ func (s *Server) Listen(address string, port int) {
 	}
 	serverAddr := fmt.Sprintf("%s:%d", address, port)
 	s.LogInfo("Server Started", serverAddr)
-	for _, m := range Metrics {
+
+	for _, m := range ResponseMetrics {
 		prometheus.MustRegister(m)
 	}
+	for _, m := range ErrorMetrics {
+		prometheus.MustRegister(m)
+	}
+
 	http.Handle("/metrics", prometheus.Handler())
 	http.ListenAndServe(serverAddr, nil)
 }
@@ -64,15 +69,14 @@ func (s *Server) MonitorTimingReports() {
 
 // HandleReport will process incoming timing reports
 func (s *Server) HandleReport(r TimingReport) {
-	if len(r.MetricName) == 0 {
-		mn, ok := LookupMetricNameByPath(r.Path)
-		if !ok {
-			s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
-			return
-		}
-		r.MetricName = mn
+	if r.Error != nil {
+		s.HandleError(r)
 	}
-	metric, ok := Metrics[r.MetricName]
+	if _, ok := r.EnsureName(); !ok {
+		s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
+		return
+	}
+	metric, ok := ResponseMetrics[r.MetricName]
 	if !ok {
 		s.LogWarn("HandleReport - Failed to find metric by name %v\n", r.MetricName)
 		return
@@ -83,6 +87,34 @@ func (s *Server) HandleReport(r TimingReport) {
 			"Metric":   r.MetricName,
 			"Duration": r.DurationSeconds,
 		}).Info("metric")
+	}
+}
+
+// HandleError will process incoming timing reports with error
+func (s *Server) HandleError(r TimingReport) {
+
+	if _, ok := r.EnsureName(); !ok {
+		s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
+		return
+	}
+	resMetric, ok := ResponseMetrics[r.MetricName]
+	if !ok {
+		s.LogWarn("HandleReport - Failed to find metric by name %v\n", r.MetricName)
+		return
+	}
+	errMetric, ok := ErrorMetrics[r.MetricName]
+	if !ok {
+		s.LogWarn("HandleReport - Failed to find error metric by name %v\n", r.MetricName)
+		return
+	}
+	errMetric.Inc()
+	resMetric.Set(0) // If err, we want to report a non-response
+
+	if s.Output != nil {
+		s.Output.WithFields(logrus.Fields{
+			"Metric": r.MetricName,
+			"Err":    r.Error,
+		}).Info("metric error")
 	}
 }
 

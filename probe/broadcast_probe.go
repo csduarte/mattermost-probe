@@ -50,15 +50,14 @@ func (bp *BroadcastProbe) Setup() error {
 	if len(bp.Config.ChannelID) < 1 {
 		err := bp.getChannelID(bp.Config.ChannelName)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get channel id - %s", err)
 		}
 	}
-
 	if err := bp.ensureMembership(bp.Listener); err != nil {
-		return err
+		return fmt.Errorf("listener could not join channel - %s", err)
 	}
 	if err := bp.ensureMembership(bp.Speaker); err != nil {
-		return err
+		return fmt.Errorf("speaker could not join channel - %s", err)
 	}
 
 	bp.Listener.AddSubscription(bp)
@@ -66,7 +65,7 @@ func (bp *BroadcastProbe) Setup() error {
 	return nil
 }
 
-// Start will kick off the probe
+// Start will kick off the probe]\
 func (bp *BroadcastProbe) Start() error {
 
 	if bp.Active {
@@ -75,7 +74,7 @@ func (bp *BroadcastProbe) Start() error {
 
 	go bp.listenForEvents()
 
-	writeTicker := time.NewTicker(time.Millisecond * bp.Config.Frequency)
+	writeTicker := time.NewTicker(time.Duration(bp.Config.Frequency * float64(time.Second)))
 	go func() {
 		for {
 			select {
@@ -86,6 +85,20 @@ func (bp *BroadcastProbe) Start() error {
 			}
 		}
 	}()
+
+	if bp.Config.Cutoff > 0 {
+		overdueTicker := time.NewTicker(time.Duration((bp.Config.Cutoff / 4) * float64(time.Second)))
+		go func() {
+			for {
+				select {
+				case <-bp.StopChannel:
+					return
+				case <-overdueTicker.C:
+					go bp.CheckOverdue()
+				}
+			}
+		}()
+	}
 
 	bp.Active = true
 	return nil
@@ -101,7 +114,7 @@ func (bp *BroadcastProbe) SendWrite() {
 	p.UserId = bp.Speaker.User.Id
 	p.Message = uid
 	if err := bp.Speaker.CreatePost(p); err != nil {
-		bp.Speaker.LogError("Error while SendWrite", err.Error())
+		bp.Speaker.LogError("Error while while Speaking", err.Error())
 	}
 }
 
@@ -118,10 +131,8 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	post := model.PostFromJson(strings.NewReader(event.Data["post"].(string)))
 	uid := post.Message
 	end := time.Now()
-	start, ok := bp.Messages.Delete(uid)
-	if !ok {
-		bp.Speaker.LogError("Failed to find message by uuid")
-	}
+	start, _ := bp.Messages.Delete(uid)
+	fmt.Printf("Broadcast: %f", end.Sub(start).Seconds())
 	if bp.TimingChannel != nil {
 		bp.TimingChannel <- metrics.TimingReport{
 			MetricName:      metrics.MetricProbeBroadcast,
@@ -158,30 +169,29 @@ func (bp BroadcastProbe) GetSubscription() *mattermost.WebSocketSubscription {
 	return wss
 }
 
+func (bp BroadcastProbe) reportOverdue() {
+	if bp.TimingChannel == nil {
+		return
+	}
+	bp.TimingChannel <- metrics.TimingReport{
+		MetricName:      metrics.MetricProbeBroadcast,
+		Path:            "",
+		DurationSeconds: 0,
+		Error:           fmt.Errorf("Message over cutoff %v", bp.Config.Cutoff),
+	}
+
+}
+
+// CheckOverdue will handle any overdue messages
+func (bp *BroadcastProbe) CheckOverdue() {
+	if overdue := bp.Messages.Overdue(bp.Config.Cutoff); len(overdue) > 0 {
+		for id := range overdue {
+			bp.Messages.Delete(id)
+			bp.reportOverdue()
+		}
+	}
+}
+
 // func (wc *WriteCheck) Stop() {
 // 	wc.StopChannel <- true
 // }
-// CheckOverdue will handle any overdue messages
-// func (bp *BroadcastProbe) CheckOverdue() {
-// 	for {
-// 		if id, delay := bp.Messages.FistOverdue(50); delay > 0 {
-// 			bp.Messages.Delete(id)
-// 			fmt.Printf("WARN: SLOW MESAGE took %v ms", delay)
-// 			continue
-// 		}
-// 		break
-// 	}
-// }
-
-// from start
-// overdueTicker := time.NewTicker(time.Millisecond * 500)
-// go func() {
-// 	for {
-// 		select {
-// 		case <-bp.StopChannel:
-// 			return
-// 		case <-overdueTicker.C:
-// 			go bp.CheckOverdue()
-// 		}
-// 	}
-// }()

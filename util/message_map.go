@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -43,18 +44,21 @@ func (mm *MessageMap) Delete(key string) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// FistOverdue will return if it finds any message beyond cutoff
-func (mm *MessageMap) FistOverdue(cutoff time.Duration) (string, time.Duration) {
+// Overdue will return any messages with durations longer than cutoff in seconds
+func (mm *MessageMap) Overdue(cutoffSeconds float64) map[string]float64 {
+	overdue := map[string]float64{}
 	mm.RLock()
 	defer mm.RUnlock()
 	now := time.Now()
 	for id, start := range mm.Items {
-		delay := now.Sub(start)
-		if delay >= cutoff {
-			return id, delay
+		duration := now.Sub(start).Seconds()
+		fmt.Printf("Comparing now: %v, duration: %f, cutoff: %v\n", start, duration, cutoffSeconds)
+		if duration >= cutoffSeconds {
+			fmt.Printf("Overdue found dur: %f cutoff: %v\n", duration, cutoffSeconds)
+			overdue[id] = duration
 		}
 	}
-	return "", 0
+	return overdue
 }
 
 // Empty will reset the contents of the message map
