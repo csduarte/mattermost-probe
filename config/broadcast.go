@@ -5,6 +5,6 @@ type BroadcastConfig struct {
 	Enabled     bool    `yaml:"enabled"`
 	Frequency   float64 `yaml:"frequency_sec"`
 	Cutoff      float64 `yaml:"cutoff_sec"`
-	ChannelName string  `yaml:"channelName"`
-	ChannelID   string  `yaml:"channelID"`
+	ChannelName string  `yaml:"channel_name"`
+	ChannelID   string  `yaml:"channel_id"`
 }

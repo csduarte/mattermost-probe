@@ -1,18 +1,18 @@
-# To be completed when basic config is closer to completion
 host: http://localhost:8065
 ws_host: ws://localhost:8065
-team_id: xdi6bbz8cjg5py9433q61d99iy
-bind_address: 0.0.0.0
+team_id: nuydp41iytfkzxaagdzobi74gc
+bind_address: 127.0.0.1
 port: 8067
 
 user_a:
-  email: dchristopher
-  password: dchristopher
+  email: probe1@test.com
+  password: probe1
 user_b:
-  email: duarte
-  password: duarte
+  email: probe2@test.com
+  password: probe2
 
 broadcast_config:
   enabled: true
-  frequency_ms: 2000
-  channelName: super-test #System Name, not display name
+  frequency_sec: 1
+  cutoff_sec: 4
+  channel_name: super-test #System Name, not display name
