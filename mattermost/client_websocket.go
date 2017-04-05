@@ -8,7 +8,7 @@ import (
 
 // StartWS will create the websocket connection and begin listening
 func (c *Client) StartWS(url string) error {
-	wsClient, err := model.NewWebSocketClient(url, c.API.AuthToken)
+	wsClient, err := model.NewWebSocketClient(url, c.API.GetAuthToken())
 	if err != nil {
 		return err
 	}

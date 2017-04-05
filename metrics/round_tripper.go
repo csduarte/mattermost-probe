@@ -23,7 +23,7 @@ func NewTimedRoundTripper(reportChanel chan TimingReport) *TimedRoundTripper {
 }
 
 // RoundTrip will send off the response time to the report channel
-func (trt *TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
+func (trt TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 	requestStart := time.Now()
 	resp, err := trt.baseRoundTripper.RoundTrip(r)
 	requestEnd := time.Now()
