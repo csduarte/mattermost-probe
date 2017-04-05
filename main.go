@@ -17,6 +17,9 @@ import (
 var log *logrus.Logger
 
 func main() {
+
+	//TODO: Add PID check for multiple process
+
 	var configLocation, logLocation, outputLocation string
 	var verbose bool
 	flag.StringVar(&configLocation, "config", "./config.yaml", "Config location")
@@ -25,6 +28,7 @@ func main() {
 	flag.BoolVar(&verbose, "verbose", false, "Set Log level to debug")
 	flag.Parse()
 
+	// TODO: move log establish into config
 	log = util.NewFileLogger(logLocation, verbose)
 
 	log.Infof("Application Started")
@@ -43,13 +47,13 @@ func main() {
 		applicationExit("Config error - " + err.Error())
 	}
 
+	// TODO: Move to server startup metrics package
 	server := metrics.NewServer(log, outputLocation)
 	go server.Listen(cfg.BindAddr, cfg.Port)
 
 	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel, log)
 	userB := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel, log)
 
-	// Need real urls
 	if err := userA.Establish(cfg.WSHost, cfg.UserA); err != nil {
 		applicationExit("Could not establish user A - " + err.Error())
 	}
