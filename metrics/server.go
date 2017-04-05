@@ -81,7 +81,7 @@ func (s *Server) HandleReport(r TimingReport) {
 		s.LogWarn("HandleReport - Failed to find metric by name %v\n", r.MetricName)
 		return
 	}
-	metric.Set(r.DurationSeconds)
+	metric.Observe(r.DurationSeconds)
 	if s.Output != nil {
 		s.Output.WithFields(logrus.Fields{
 			"Metric":   r.MetricName,
@@ -97,18 +97,12 @@ func (s *Server) HandleError(r TimingReport) {
 		s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
 		return
 	}
-	resMetric, ok := ResponseMetrics[r.MetricName]
-	if !ok {
-		s.LogWarn("HandleReport - Failed to find metric by name %v\n", r.MetricName)
-		return
-	}
 	errMetric, ok := ErrorMetrics[r.MetricName]
 	if !ok {
 		s.LogWarn("HandleReport - Failed to find error metric by name %v\n", r.MetricName)
 		return
 	}
 	errMetric.Inc()
-	resMetric.Set(0) // If err, we want to report a non-response
 
 	if s.Output != nil {
 		s.Output.WithFields(logrus.Fields{
