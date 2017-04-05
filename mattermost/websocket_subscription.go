@@ -35,8 +35,6 @@ func (wss *WebSocketSubscription) Emit(event *model.WebSocketEvent) {
 // ShouldNotify returns true if the event matches the subscription in at least one way
 func (wss *WebSocketSubscription) ShouldNotify(event *model.WebSocketEvent) bool {
 	channelMatch := false
-
-	// fmt.Printf("Channels %v in %v?\n", event.Broadcast.ChannelId, wss.ChannelIDs)
 	for _, cID := range wss.ChannelIDs {
 		if event.Broadcast != nil && cID == event.Broadcast.ChannelId {
 			channelMatch = true
@@ -44,7 +42,6 @@ func (wss *WebSocketSubscription) ShouldNotify(event *model.WebSocketEvent) bool
 	}
 
 	eventMatch := false
-	// fmt.Printf("Event: %v in %v?\n", event.Event, wss.EventTypes)
 	for _, t := range wss.EventTypes {
 		if t == event.Event {
 			eventMatch = true
@@ -68,7 +65,6 @@ func (wss *WebSocketSubscription) ShouldNotify(event *model.WebSocketEvent) bool
 		}
 	}
 
-	// fmt.Printf("C: %t, U: %t, E: %t\n", channelMatch, userMatch, eventMatch)
 	if wss.RequireAllMatch {
 		return channelMatch && userMatch && eventMatch
 	}

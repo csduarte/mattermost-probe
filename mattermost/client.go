@@ -11,7 +11,7 @@ import (
 
 // Client structure holds mattermost api, websocket, and user objects
 type Client struct {
-	API  *model.Client
+	API  APIInterface
 	WS   *model.WebSocketClient
 	User *model.User
 	Subs []*WebSocketSubscription
@@ -21,22 +21,22 @@ type Client struct {
 // NewClient generateds a new API and WebSocket Client}
 func NewClient(url, teamID string, tc metrics.TimingChannel, log *logrus.Logger) *Client {
 	c := Client{
-		model.NewClient(url),
+		NewAPIClient(url),
 		nil,
 		nil,
 		[]*WebSocketSubscription{},
 		log,
 	}
-	c.API.TeamId = teamID
+	c.API.SetTeamID(teamID)
 	if tc != nil {
-		c.API.HttpClient.Transport = metrics.NewTimedRoundTripper(tc)
+		c.API.SetTransport(metrics.NewTimedRoundTripper(tc))
 	}
 	return &c
 }
 
 // Establish will ping the server, login, and create the websocket connection
 func (c *Client) Establish(socketURL string, creds config.Credentials) error {
-	if err := c.PingAPI(); err != nil {
+	if _, err := c.API.GetPing(); err != nil {
 		return fmt.Errorf("Server Down: %v", err.Error())
 	}
 
@@ -101,3 +101,18 @@ func (c *Client) CreatePost(post *model.Post) error {
 	}
 	return nil
 }
+
+// LogError is helper for error logging
+func (c *Client) LogError(items ...interface{}) {
+	if c.Log != nil {
+		c.Log.Error(items)
+	}
+}
+
+// LogInfo is a helper for info logging
+func (c *Client) LogInfo(items ...interface{}) {
+	if c.Log != nil {
+		c.Log.Info(items)
+	}
+}
+
