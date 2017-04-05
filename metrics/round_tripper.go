@@ -32,8 +32,8 @@ func (trt *TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error)
 	if err != nil || resp.StatusCode >= 400 {
 		err = errors.New("Response Code >= 400, forcing error")
 	}
-	if time.Duration(requestDuration) > 60*time.Second {
-		err = errors.New("Response Duration >= 60s, forcing error")
+	if time.Duration(requestDuration) > 10*time.Second {
+		err = errors.New("Response Duration >= 10s, forcing error")
 	}
 
 	trt.reportChannel <- TimingReport{

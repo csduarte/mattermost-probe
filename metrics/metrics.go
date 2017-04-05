@@ -5,9 +5,9 @@ import "github.com/prometheus/client_golang/prometheus"
 // Metric string bases for Prometheus Metric names
 const (
 	MetricAPIGeneralPing      = "probe_general_ping"
-	MetricAPIGeneralLogin     = "probe_general_login_duration_seconds"
-	MetricAPIChannelGetByName = "probe_channel_getbyname_duration_seconds"
-	MetricAPIChannelJoin      = "probe_channel_join_duration_seconds"
+	MetricAPIGeneralLogin     = "probe_general_login"
+	MetricAPIChannelGetByName = "probe_channel_getbyname"
+	MetricAPIChannelJoin      = "probe_channel_join"
 	MetricAPIPostCreate       = "probe_post_create"
 	MetricProbeBroadcast      = "probe_broadcast_post"
 )
@@ -15,29 +15,29 @@ const (
 //TODO: Let stan now that MetricBrokeBroadcast "probe_broadcast_post_recieve_seconds" -> "probe_broadcast_post_duration_seconds"
 
 // ReponseMetrics holds the response metrics in a map for easy lookup, should match error metrics 1:1
-var ResponseMetrics = map[string]prometheus.Gauge{
+var ResponseMetrics = map[string]prometheus.Histogram{
 	// TODO: Figure out if it should be histogram or gurae
-	MetricAPIGeneralPing: prometheus.NewGauge(prometheus.GaugeOpts{
+	MetricAPIGeneralPing: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: appendResponseSuffix(MetricAPIGeneralPing),
 		Help: "Response time of general ping",
 	}),
-	MetricAPIGeneralLogin: prometheus.NewGauge(prometheus.GaugeOpts{
+	MetricAPIGeneralLogin: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: appendResponseSuffix(MetricAPIGeneralLogin),
 		Help: "Response time of general login",
 	}),
-	MetricAPIChannelGetByName: prometheus.NewGauge(prometheus.GaugeOpts{
+	MetricAPIChannelGetByName: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: appendResponseSuffix(MetricAPIChannelGetByName),
 		Help: "Response time of channel get by name",
 	}),
-	MetricAPIChannelJoin: prometheus.NewGauge(prometheus.GaugeOpts{
+	MetricAPIChannelJoin: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: MetricAPIChannelJoin,
 		Help: "Response time of channel join",
 	}),
-	MetricAPIPostCreate: prometheus.NewGauge(prometheus.GaugeOpts{
+	MetricAPIPostCreate: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: appendResponseSuffix(MetricAPIPostCreate),
 		Help: "Response time of post create",
 	}),
-	MetricProbeBroadcast: prometheus.NewGauge(prometheus.GaugeOpts{
+	MetricProbeBroadcast: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: appendResponseSuffix(MetricProbeBroadcast),
 		Help: "Time from post create to reception by different user",
 	}),
@@ -73,7 +73,7 @@ var ErrorMetrics = map[string]prometheus.Counter{
 }
 
 func appendResponseSuffix(s string) string {
-	return s + "_duration_second"
+	return s + "_duration_seconds"
 }
 
 func appendErrorSuffix(s string) string {
