@@ -132,7 +132,6 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	uid := post.Message
 	end := time.Now()
 	start, _ := bp.Messages.Delete(uid)
-	fmt.Printf("Broadcast: %f", end.Sub(start).Seconds())
 	if bp.TimingChannel != nil {
 		bp.TimingChannel <- metrics.TimingReport{
 			MetricName:      metrics.MetricProbeBroadcast,

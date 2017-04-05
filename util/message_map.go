@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -52,9 +51,7 @@ func (mm *MessageMap) Overdue(cutoffSeconds float64) map[string]float64 {
 	now := time.Now()
 	for id, start := range mm.Items {
 		duration := now.Sub(start).Seconds()
-		fmt.Printf("Comparing now: %v, duration: %f, cutoff: %v\n", start, duration, cutoffSeconds)
 		if duration >= cutoffSeconds {
-			fmt.Printf("Overdue found dur: %f cutoff: %v\n", duration, cutoffSeconds)
 			overdue[id] = duration
 		}
 	}
