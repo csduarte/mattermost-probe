@@ -17,27 +17,27 @@ const (
 // ResponseHistograms holds the response metrics in a map for easy lookup, should match error metrics 1:1
 var ResponseHistograms = map[string]prometheus.Histogram{
 	MetricAPIGeneralPing: prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: appendResponseSuffix(MetricAPIGeneralPing),
+		Name: appendHistogramSuffix(MetricAPIGeneralPing),
 		Help: "Response time of general ping",
 	}),
 	MetricAPIGeneralLogin: prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: appendResponseSuffix(MetricAPIGeneralLogin),
+		Name: appendHistogramSuffix(MetricAPIGeneralLogin),
 		Help: "Response time of general login",
 	}),
 	MetricAPIChannelGetByName: prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: appendResponseSuffix(MetricAPIChannelGetByName),
+		Name: appendHistogramSuffix(MetricAPIChannelGetByName),
 		Help: "Response time of channel get by name",
 	}),
 	MetricAPIChannelJoin: prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: MetricAPIChannelJoin,
+		Name: appendHistogramSuffix(MetricAPIChannelJoin),
 		Help: "Response time of channel join",
 	}),
 	MetricAPIPostCreate: prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: appendResponseSuffix(MetricAPIPostCreate),
+		Name: appendHistogramSuffix(MetricAPIPostCreate),
 		Help: "Response time of post create",
 	}),
 	MetricProbeBroadcast: prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: appendResponseSuffix(MetricProbeBroadcast),
+		Name: appendHistogramSuffix(MetricProbeBroadcast),
 		Help: "Time from post create to reception by different user",
 	}),
 }
@@ -45,27 +45,27 @@ var ResponseHistograms = map[string]prometheus.Histogram{
 //ResponseGauges holds response gauages for latency
 var ResponseGauges = map[string]prometheus.Gauge{
 	MetricAPIGeneralPing: prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: appendResponseSuffix(MetricAPIGeneralPing),
+		Name: appendGaugeSuffix(MetricAPIGeneralPing),
 		Help: "Response time of general ping",
 	}),
 	MetricAPIGeneralLogin: prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: appendResponseSuffix(MetricAPIGeneralLogin),
+		Name: appendGaugeSuffix(MetricAPIGeneralLogin),
 		Help: "Response time of general login",
 	}),
 	MetricAPIChannelGetByName: prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: appendResponseSuffix(MetricAPIChannelGetByName),
+		Name: appendGaugeSuffix(MetricAPIChannelGetByName),
 		Help: "Response time of channel get by name",
 	}),
 	MetricAPIChannelJoin: prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: MetricAPIChannelJoin,
+		Name: appendGaugeSuffix(MetricAPIChannelJoin),
 		Help: "Response time of channel join",
 	}),
 	MetricAPIPostCreate: prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: appendResponseSuffix(MetricAPIPostCreate),
+		Name: appendGaugeSuffix(MetricAPIPostCreate),
 		Help: "Response time of post create",
 	}),
 	MetricProbeBroadcast: prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: appendResponseSuffix(MetricProbeBroadcast),
+		Name: appendGaugeSuffix(MetricProbeBroadcast),
 		Help: "Time from post create to reception by different user",
 	}),
 }
@@ -99,8 +99,12 @@ var ErrorCounters = map[string]prometheus.Counter{
 	}),
 }
 
-func appendResponseSuffix(s string) string {
+func appendGaugeSuffix(s string) string {
 	return s + "_duration_seconds"
+}
+
+func appendHistogramSuffix(s string) string {
+	return s + "duration_histogram_seconds"
 }
 
 func appendErrorSuffix(s string) string {
