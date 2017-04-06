@@ -104,7 +104,7 @@ func appendGaugeSuffix(s string) string {
 }
 
 func appendHistogramSuffix(s string) string {
-	return s + "duration_histogram_seconds"
+	return s + "_duration_histogram_seconds"
 }
 
 func appendErrorSuffix(s string) string {
