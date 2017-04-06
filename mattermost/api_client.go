@@ -24,11 +24,7 @@ type APIInterface interface {
 	SetTeamID(string)
 	SetTransport(http.RoundTripper)
 	GetTransport() http.RoundTripper
-	GetAuthToken() string	
-}
-
-func NewWebsocketClient(url string, token string) {
-	
+	GetAuthToken() string
 }
 
 // NewAPIClient returns a new API Client

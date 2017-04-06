@@ -46,10 +46,13 @@ func (s *Server) Listen(address string, port int) {
 	serverAddr := fmt.Sprintf("%s:%d", address, port)
 	s.LogInfo("Server Started", serverAddr)
 
-	for _, m := range ResponseMetrics {
+	for _, m := range ResponseHistograms {
 		prometheus.MustRegister(m)
 	}
-	for _, m := range ErrorMetrics {
+	for _, m := range ResponseGauges {
+		prometheus.MustRegister(m)
+	}
+	for _, m := range ErrorCounters {
 		prometheus.MustRegister(m)
 	}
 
@@ -76,12 +79,18 @@ func (s *Server) HandleReport(r TimingReport) {
 		s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
 		return
 	}
-	metric, ok := ResponseMetrics[r.MetricName]
+	gauge, ok := ResponseGauges[r.MetricName]
 	if !ok {
-		s.LogWarn("HandleReport - Failed to find metric by name %v\n", r.MetricName)
+		s.LogWarn("HandleReport - Failed to find gauage by name %v\n", r.MetricName)
 		return
 	}
-	metric.Observe(r.DurationSeconds)
+	histogram, ok := ResponseHistograms[r.MetricName]
+	if !ok {
+		s.LogWarn("HandleReport - Failed to find histogram by name %v\n", r.MetricName)
+		return
+	}
+	gauge.Set(r.DurationSeconds)
+	histogram.Observe(r.DurationSeconds)
 	if s.Output != nil {
 		s.Output.WithFields(logrus.Fields{
 			"Metric":   r.MetricName,
@@ -97,12 +106,12 @@ func (s *Server) HandleError(r TimingReport) {
 		s.LogWarn("HandleReport - Failed to find metric by path %v\n", r.Path)
 		return
 	}
-	errMetric, ok := ErrorMetrics[r.MetricName]
+	counter, ok := ErrorCounters[r.MetricName]
 	if !ok {
 		s.LogWarn("HandleReport - Failed to find error metric by name %v\n", r.MetricName)
 		return
 	}
-	errMetric.Inc()
+	counter.Inc()
 
 	if s.Output != nil {
 		s.Output.WithFields(logrus.Fields{
