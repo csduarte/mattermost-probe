@@ -12,7 +12,7 @@ import (
 // Client structure holds mattermost api, websocket, and user objects
 type Client struct {
 	API  APIInterface
-	WS   *model.WebSocketClient
+	WS   WSInterface
 	User *model.User
 	Subs []*WebSocketSubscription
 	Log  *logrus.Logger
@@ -44,11 +44,16 @@ func (c *Client) Establish(socketURL string, creds config.Credentials) error {
 		return fmt.Errorf("Failed to login: %v", err.Error())
 	}
 
-	if err := c.StartWS(socketURL); err != nil {
+	if err := c.CreateWS(socketURL); err != nil {
 		return fmt.Errorf("Failed to connect ws: %v", err.Error())
 	}
-
+	c.StartWS()
 	return nil
+}
+
+// Listen will prompt the websocket to start a listening routine
+func (c *Client) Listen() {
+	c.StartWS()
 }
 
 // PingAPI will call the ping endpoint
@@ -115,4 +120,3 @@ func (c *Client) LogInfo(items ...interface{}) {
 		c.Log.Info(items)
 	}
 }
-

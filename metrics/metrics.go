@@ -14,9 +14,8 @@ const (
 
 //TODO: Let stan now that MetricBrokeBroadcast "probe_broadcast_post_recieve_seconds" -> "probe_broadcast_post_duration_seconds"
 
-// ReponseMetrics holds the response metrics in a map for easy lookup, should match error metrics 1:1
-var ResponseMetrics = map[string]prometheus.Histogram{
-	// TODO: Figure out if it should be histogram or gurae
+// ResponseHistograms holds the response metrics in a map for easy lookup, should match error metrics 1:1
+var ResponseHistograms = map[string]prometheus.Histogram{
 	MetricAPIGeneralPing: prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name: appendResponseSuffix(MetricAPIGeneralPing),
 		Help: "Response time of general ping",
@@ -43,8 +42,36 @@ var ResponseMetrics = map[string]prometheus.Histogram{
 	}),
 }
 
-// ErrorMetrics holds the error metrics for easy lookup, should match response metrics 1:1
-var ErrorMetrics = map[string]prometheus.Counter{
+//ResponseGauges holds response gauages for latency
+var ResponseGauges = map[string]prometheus.Gauge{
+	MetricAPIGeneralPing: prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: appendResponseSuffix(MetricAPIGeneralPing),
+		Help: "Response time of general ping",
+	}),
+	MetricAPIGeneralLogin: prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: appendResponseSuffix(MetricAPIGeneralLogin),
+		Help: "Response time of general login",
+	}),
+	MetricAPIChannelGetByName: prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: appendResponseSuffix(MetricAPIChannelGetByName),
+		Help: "Response time of channel get by name",
+	}),
+	MetricAPIChannelJoin: prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: MetricAPIChannelJoin,
+		Help: "Response time of channel join",
+	}),
+	MetricAPIPostCreate: prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: appendResponseSuffix(MetricAPIPostCreate),
+		Help: "Response time of post create",
+	}),
+	MetricProbeBroadcast: prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: appendResponseSuffix(MetricProbeBroadcast),
+		Help: "Time from post create to reception by different user",
+	}),
+}
+
+// ErrorCounters holds the error metrics for easy lookup, should match response metrics 1:1
+var ErrorCounters = map[string]prometheus.Counter{
 	// TODO: Figure out if it should be histogram or gurae
 	MetricAPIGeneralPing: prometheus.NewCounter(prometheus.CounterOpts{
 		Name: appendErrorSuffix(MetricAPIGeneralPing),

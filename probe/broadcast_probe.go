@@ -74,6 +74,11 @@ func (bp *BroadcastProbe) Start() error {
 
 	go bp.listenForEvents()
 
+	if bp.Config.Frequency < 0.2 {
+		bp.Speaker.LogInfo("Frequency cannot be set below 0.2, setting to default 1 sec")
+		bp.Config.Frequency = 1
+	}
+
 	writeTicker := time.NewTicker(time.Duration(bp.Config.Frequency * float64(time.Second)))
 	go func() {
 		for {
