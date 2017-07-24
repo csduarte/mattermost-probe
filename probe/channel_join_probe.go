@@ -6,27 +6,24 @@ import (
 
 	"github.com/csduarte/mattermost-probe/config"
 	"github.com/csduarte/mattermost-probe/mattermost"
-	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/pkg/errors"
 )
 
 // ChannelJoinProbe represent a user joining a channel
 type ChannelJoinProbe struct {
-	Client        *mattermost.Client
-	Config        *config.ChannelJoinConfig
-	TimingChannel chan metrics.TimingReport
-	StopChannel   chan bool
-	Active        bool
+	Client      *mattermost.Client
+	Config      *config.ChannelJoinConfig
+	StopChannel chan bool
+	Active      bool
 }
 
 // NewChannelJoinProbe creates a channel joining probe
 func NewChannelJoinProbe(config *config.ChannelJoinConfig, client *mattermost.Client) *ChannelJoinProbe {
 	p := ChannelJoinProbe{
-		Client:        client,
-		Config:        config,
-		TimingChannel: nil,
-		StopChannel:   make(chan bool),
-		Active:        false,
+		Client:      client,
+		Config:      config,
+		StopChannel: make(chan bool),
+		Active:      false,
 	}
 	return &p
 }

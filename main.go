@@ -72,7 +72,6 @@ func main() {
 
 	if cfg.ChannelJoinProbe.Enabled {
 		cjp := probe.NewChannelJoinProbe(&cfg.ChannelJoinProbe, userA)
-		cjp.TimingChannel = server.ReportChannel
 		probes = append(probes, cjp)
 	}
 	for _, p := range probes {
