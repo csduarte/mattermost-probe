@@ -13,11 +13,10 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// BroadcastProbe represents a test where the speaker will broadcast unique messages and the listener will check broadcast time.
-type BroadcastProbe struct {
-	Speaker       *mattermost.Client
-	Listener      *mattermost.Client
-	Config        *config.BroadcastConfig
+// ChannelJoinProbe represent a user joining a channel
+type ChannelJoinProbe struct {
+	Joiner        *mattermost.Client
+	Config        *config.ChannelJoinConfig
 	Messages      *util.MessageMap
 	EventChannel  chan *model.WebSocketEvent
 	TimingChannel chan metrics.TimingReport

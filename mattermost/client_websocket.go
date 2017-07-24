@@ -43,8 +43,8 @@ func (c *Client) handleWSEvent(event *model.WebSocketEvent) {
 }
 
 // AddSubscription will add the subscription probe to the subs for this client
-func (c *Client) AddSubscription(ps SubscriptionProbe) {
-	c.Subs = append(c.Subs, ps.GetSubscription())
+func (c *Client) AddSubscription(s Subscriber) {
+	c.Subs = append(c.Subs, s.GetSubscription())
 }
 
 func (c *Client) handleWSError() {
@@ -62,7 +62,7 @@ func (c *Client) handleWSError() {
 		rc := make(chan *model.WebSocketResponse, 100)
 		c.WS.SetEventChannel(ec)
 		c.WS.SetResponseChannel(rc)
-		c.LogError("WebSocket attempting to reconnected")
+		c.LogError("WebSocket attempting to reconnect")
 		if err := c.WS.Connect(); err != nil {
 			retryCount++
 			continue

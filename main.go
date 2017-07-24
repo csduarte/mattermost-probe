@@ -20,11 +20,11 @@ func main() {
 
 	//TODO: Add PID check for multiple process
 
-	var configLocation, logLocation, outputLocation string
+	var configLocation, logLocation, metricLocation string
 	var verbose bool
 	flag.StringVar(&configLocation, "config", "./config.yaml", "Config location")
 	flag.StringVar(&logLocation, "log", "./mattermost-probe.log", "Log Location, default")
-	flag.StringVar(&outputLocation, "output", "", "Location for metric logs")
+	flag.StringVar(&metricLocation, "metrics", "", "Location for metric logs")
 	flag.BoolVar(&verbose, "verbose", false, "Set Log level to debug")
 	flag.Parse()
 
@@ -34,7 +34,7 @@ func main() {
 	log.Infof("Application Started")
 	log.Infof("Config Location: %s", configLocation)
 	log.Infof("Log Location: %s", logLocation)
-	log.Infof("Ouptut Location: %s", outputLocation)
+	log.Infof("Metric Location: %s", metricLocation)
 
 	file, err := ioutil.ReadFile(configLocation)
 	if err != nil {
@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// TODO: Move to server startup metrics package
-	server := metrics.NewServer(log, outputLocation)
+	server := metrics.NewServer(log, metricLocation)
 	go server.Listen(cfg.BindAddr, cfg.Port)
 
 	userA := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel, log)

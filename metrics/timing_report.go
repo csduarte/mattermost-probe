@@ -8,9 +8,6 @@ type TimingReport struct {
 	Error           error
 }
 
-// TimingChannel reprsents an incoming report channel
-type TimingChannel chan TimingReport
-
 // EnsureName will fetch the name by path if possible, otherwise return empty string and not ok.
 func (tr *TimingReport) EnsureName() (string, bool) {
 	if len(tr.MetricName) > 0 {

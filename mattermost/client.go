@@ -19,7 +19,7 @@ type Client struct {
 }
 
 // NewClient generateds a new API and WebSocket Client}
-func NewClient(url, teamID string, tc metrics.TimingChannel, log *logrus.Logger) *Client {
+func NewClient(url, teamID string, tc chan metrics.TimingReport, log *logrus.Logger) *Client {
 	c := Client{
 		NewAPIClient(url),
 		nil,

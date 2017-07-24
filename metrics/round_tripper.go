@@ -9,17 +9,17 @@ import (
 // TimedRoundTripper replacement http.RoundTripper
 type TimedRoundTripper struct {
 	baseRoundTripper http.RoundTripper
-	reportChannel    TimingChannel
+	reportChannel    chan TimingReport
 }
 
 // NewTimedRoundTripper will create a new TimedRoundTripper
-func NewTimedRoundTripper(reportChanel chan TimingReport) *TimedRoundTripper {
-	rt := &TimedRoundTripper{
+func NewTimedRoundTripper(trc chan TimingReport) *TimedRoundTripper {
+	rt := TimedRoundTripper{
 		http.DefaultTransport,
-		reportChanel,
+		trc,
 	}
 
-	return rt
+	return &rt
 }
 
 // RoundTrip will send off the response time to the report channel

@@ -11,7 +11,7 @@ import (
 
 // Server respresents the Prometheus metrics and incoming channel
 type Server struct {
-	ReportChannel TimingChannel
+	ReportChannel chan TimingReport
 	Log           *logrus.Logger
 	Output        *logrus.Logger
 }

@@ -24,30 +24,35 @@ func (c *MockAPIClient) GetPing() (map[string]string, *model.AppError) {
 	}
 	return map[string]string{}, nil
 }
+
 func (c *MockAPIClient) Login(string, string) (*model.Result, *model.AppError) {
 	if c.shouldFail || c.shouldFailLogin {
 		return nil, model.NewLocAppError("", "", nil, "")
 	}
 	return &model.Result{Data: &model.User{}}, nil
 }
+
 func (c *MockAPIClient) GetChannelByName(string) (*model.Result, *model.AppError) {
 	if c.shouldFail {
 		return nil, model.NewLocAppError("", "", nil, "")
 	}
 	return &model.Result{Data: &model.Channel{}}, nil
 }
+
 func (c *MockAPIClient) JoinChannel(string) (*model.Result, *model.AppError) {
 	if c.shouldFail {
 		return nil, model.NewLocAppError("", "", nil, "")
 	}
 	return &model.Result{Data: &model.Channel{}}, nil
 }
+
 func (c *MockAPIClient) GetFile(string) (io.ReadCloser, *model.AppError) {
 	if c.shouldFail {
 		return nil, model.NewLocAppError("", "", nil, "")
 	}
 	return nil, nil
 }
+
 func (c *MockAPIClient) CreatePost(*model.Post) (*model.Result, *model.AppError) {
 	if c.shouldFail {
 		return nil, model.NewLocAppError("", "", nil, "")
@@ -73,7 +78,7 @@ func (c *MockAPIClient) GetAuthToken() string {
 }
 
 func TestNewClient(t *testing.T) {
-	var tc metrics.TimingChannel
+	var tc chan metrics.TimingReport
 	var log logrus.Logger
 	mockID := "teamID"
 	c := NewClient("", mockID, tc, &log)
@@ -84,7 +89,7 @@ func TestNewClient(t *testing.T) {
 		t.Fatal("TimedRoundTripper should *not* be set without timing channel")
 	}
 
-	tc = make(metrics.TimingChannel)
+	tc = make(chan metrics.TimingReport)
 	c = NewClient("", "teamID", tc, &log)
 	if _, ok := c.API.GetTransport().(*metrics.TimedRoundTripper); !ok {
 		t.Fatal("TimedRoundTripper should be set")
