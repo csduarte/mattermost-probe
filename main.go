@@ -70,6 +70,11 @@ func main() {
 		probes = append(probes, bp)
 	}
 
+	if cfg.ChannelJoinProbe.Enabled {
+		cjp := probe.NewChannelJoinProbe(&cfg.ChannelJoinProbe, userA)
+		cjp.TimingChannel = server.ReportChannel
+		probes = append(probes, cjp)
+	}
 	for _, p := range probes {
 		if err := p.Setup(); err != nil {
 			// TODO: Need a probe get name function

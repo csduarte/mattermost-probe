@@ -4,14 +4,15 @@ import "fmt"
 
 // Config represents the application config
 type Config struct {
-	TeamID         string          `yaml:"team_id"`
-	Host           string          `yaml:"host"`
-	WSHost         string          `yaml:"ws_host"`
-	BindAddr       string          `yaml:"bind_address"`
-	Port           int             `yaml:"port"`
-	UserA          Credentials     `yaml:"user_a"`
-	UserB          Credentials     `yaml:"user_b"`
-	BroadcastProbe BroadcastConfig `yaml:"broadcast_config"`
+	TeamID           string            `yaml:"team_id"`
+	Host             string            `yaml:"host"`
+	WSHost           string            `yaml:"ws_host"`
+	BindAddr         string            `yaml:"bind_address"`
+	Port             int               `yaml:"port"`
+	UserA            Credentials       `yaml:"user_a"`
+	UserB            Credentials       `yaml:"user_b"`
+	BroadcastProbe   BroadcastConfig   `yaml:"broadcast_probe"`
+	ChannelJoinProbe ChannelJoinConfig `yaml:"channel_join_probe"`
 }
 
 // Validate will ensure that all required values are or default values are set

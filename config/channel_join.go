@@ -1,5 +1,6 @@
 package config
 
+// ChannelJoinConfig represents the configuration for ChannelJoinProbe
 type ChannelJoinConfig struct {
 	Enabled     bool    `yaml:"enabled"`
 	Frequency   float64 `yaml:"frequency_sec"`

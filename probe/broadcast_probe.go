@@ -83,6 +83,7 @@ func (bp *BroadcastProbe) Start() error {
 		for {
 			select {
 			case <-bp.StopChannel:
+				bp.Active = false
 				return
 			case <-writeTicker.C:
 				go bp.SendWrite()
@@ -118,7 +119,7 @@ func (bp *BroadcastProbe) SendWrite() {
 	p.UserId = bp.Speaker.User.Id
 	p.Message = uid
 	if err := bp.Speaker.CreatePost(p); err != nil {
-		bp.Speaker.LogError("Speak Error:", err.Error())
+		bp.Speaker.LogError("Broadcast Speaker Error:", err.Error())
 	}
 }
 
@@ -194,7 +195,3 @@ func (bp *BroadcastProbe) CheckOverdue() {
 		}
 	}
 }
-
-// func (wc *WriteCheck) Stop() {
-// 	wc.StopChannel <- true
-// }

@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -35,7 +36,7 @@ func (trt TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) 
 	if time.Duration(requestDuration) > 10*time.Second {
 		err = errors.New("Response Duration >= 10s, forcing error")
 	}
-
+	fmt.Println(r.URL.Path, requestDuration)
 	trt.reportChannel <- TimingReport{
 		"",
 		r.URL.Path,
