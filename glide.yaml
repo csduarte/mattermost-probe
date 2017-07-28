@@ -16,3 +16,5 @@ import:
   version: ~0.11.4
 - package: github.com/rifflock/lfshook
   version: ~1.5.0
+- package: sourcegraph.com/sourcegraph/go-selenium
+  version: ~0.6.0

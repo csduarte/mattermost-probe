@@ -15,21 +15,23 @@ import (
 
 // BroadcastProbe represents a test where the speaker will broadcast unique messages and the listener will check broadcast time.
 type BroadcastProbe struct {
+	Name          string
 	Speaker       *mattermost.Client
 	Listener      *mattermost.Client
-	Config        *config.BroadcastConfig
+	Config        config.BroadcastConfig
 	Messages      *util.MessageMap
 	EventChannel  chan *model.WebSocketEvent
-	TimingChannel metrics.TimingChannel
+	TimingChannel chan metrics.Report
 	StopChannel   chan bool
 	Active        bool
 }
 
 // NewBroadcastProbe creates a new base probe
-func NewBroadcastProbe(c *config.BroadcastConfig, s, l *mattermost.Client) *BroadcastProbe {
-	bp := &BroadcastProbe{
-		s,
-		l,
+func NewBroadcastProbe(c config.BroadcastConfig, speaker, listener *mattermost.Client) *BroadcastProbe {
+	bp := BroadcastProbe{
+		"Broadcast Probe",
+		speaker,
+		listener,
 		c,
 		util.NewMessageMap(),
 		make(chan *model.WebSocketEvent, 10),
@@ -37,8 +39,7 @@ func NewBroadcastProbe(c *config.BroadcastConfig, s, l *mattermost.Client) *Broa
 		make(chan bool),
 		false,
 	}
-
-	return bp
+	return &bp
 }
 
 // Setup will run once on application starts
@@ -65,7 +66,7 @@ func (bp *BroadcastProbe) Setup() error {
 	return nil
 }
 
-// Start will kick off the probe]\
+// Start will kick off the probe
 func (bp *BroadcastProbe) Start() error {
 
 	if bp.Active {
@@ -84,6 +85,7 @@ func (bp *BroadcastProbe) Start() error {
 		for {
 			select {
 			case <-bp.StopChannel:
+				bp.Active = false
 				return
 			case <-writeTicker.C:
 				go bp.SendWrite()
@@ -119,7 +121,7 @@ func (bp *BroadcastProbe) SendWrite() {
 	p.UserId = bp.Speaker.User.Id
 	p.Message = uid
 	if err := bp.Speaker.CreatePost(p); err != nil {
-		bp.Speaker.LogError("Error while while Speaking", err.Error())
+		bp.Speaker.LogError("Broadcast Speaker Error:", err.Error())
 	}
 }
 
@@ -138,8 +140,8 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	end := time.Now()
 	start, _ := bp.Messages.Delete(uid)
 	if bp.TimingChannel != nil {
-		bp.TimingChannel <- metrics.TimingReport{
-			MetricName:      metrics.MetricProbeBroadcast,
+		bp.TimingChannel <- metrics.Report{
+			Route:           metrics.RouteBroadcastReceived,
 			DurationSeconds: end.Sub(start).Seconds(),
 		}
 	}
@@ -177,9 +179,8 @@ func (bp BroadcastProbe) reportOverdue() {
 	if bp.TimingChannel == nil {
 		return
 	}
-	bp.TimingChannel <- metrics.TimingReport{
-		MetricName:      metrics.MetricProbeBroadcast,
-		Path:            "",
+	bp.TimingChannel <- metrics.Report{
+		Route:           metrics.RouteBroadcastReceived,
 		DurationSeconds: 0,
 		Error:           fmt.Errorf("Message over cutoff %v", bp.Config.Cutoff),
 	}
@@ -196,6 +197,6 @@ func (bp *BroadcastProbe) CheckOverdue() {
 	}
 }
 
-// func (wc *WriteCheck) Stop() {
-// 	wc.StopChannel <- true
-// }
+func (bp *BroadcastProbe) String() string {
+	return bp.Name
+}

@@ -51,8 +51,11 @@ func (wss *WebSocketSubscription) ShouldNotify(event *model.WebSocketEvent) bool
 	// Get userID from event data
 	userID := ""
 	if event.Event == model.WEBSOCKET_EVENT_POSTED {
-		post := model.PostFromJson(strings.NewReader(event.Data["post"].(string)))
-		userID = post.UserId
+		data, ok := event.Data["post"].(string)
+		if ok {
+			post := model.PostFromJson(strings.NewReader(data))
+			userID = post.UserId
+		}
 	} else if ui, ok := event.Data["user_id"].(string); ok {
 		userID = ui
 	}
