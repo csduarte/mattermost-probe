@@ -1,0 +1,37 @@
+host: http://localhost:8065
+ws_host: ws://localhost:8065
+team_id: nuydp41iytfkzxaagdzobi74gc
+bind_address: 127.0.0.1
+port: 8067
+
+flags:
+  verbose: true
+
+user_a:
+  email: probe1@test.com
+  password: probe1
+user_b:
+  email: probe2@test.com
+  password: probe2
+
+broadcast_probe:
+  enabled: true 
+  frequency_sec: 1
+  cutoff_sec: 4
+  channel_name: super-test 
+
+channel_join_probe:
+  enabled: true 
+  frequency_sec: 1
+  channel_name: super-test
+
+ping_probe:
+  enabled: true
+  frequency_sec: 1
+  resources:
+    - name: index_page_authenticated 
+      url: http://localhost:8065
+      include_auth: true
+    - name: index_page
+      url: http://localhost:8065
+      include_auth: false
