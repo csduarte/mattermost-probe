@@ -19,7 +19,7 @@ type Client struct {
 }
 
 // NewClient generateds a new API and WebSocket Client}
-func NewClient(url, teamID string, tc chan metrics.TimingReport, log *logrus.Logger) *Client {
+func NewClient(url, teamID string, tc chan metrics.Report, log *logrus.Logger) *Client {
 	c := Client{
 		NewAPIClient(url),
 		nil,
@@ -29,7 +29,7 @@ func NewClient(url, teamID string, tc chan metrics.TimingReport, log *logrus.Log
 	}
 	c.API.SetTeamID(teamID)
 	if tc != nil {
-		c.API.SetTransport(metrics.NewTimedRoundTripper(tc))
+		c.API.SetTransport(metrics.NewTimedRoundTripper(tc, log))
 	}
 	return &c
 }
@@ -108,15 +108,15 @@ func (c *Client) CreatePost(post *model.Post) error {
 }
 
 // LogError is helper for error logging
-func (c *Client) LogError(items ...interface{}) {
+func (c *Client) LogError(format string, args ...interface{}) {
 	if c.Log != nil {
-		c.Log.Error(items)
+		c.Log.Errorf(format, args)
 	}
 }
 
 // LogInfo is a helper for info logging
-func (c *Client) LogInfo(items ...interface{}) {
+func (c *Client) LogInfo(format string, args ...interface{}) {
 	if c.Log != nil {
-		c.Log.Info(items)
+		c.Log.Infof(format, args)
 	}
 }

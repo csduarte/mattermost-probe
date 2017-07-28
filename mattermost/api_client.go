@@ -25,6 +25,7 @@ type APIInterface interface {
 	SetTransport(http.RoundTripper)
 	GetTransport() http.RoundTripper
 	GetAuthToken() string
+	GetHTTPClient() *http.Client
 }
 
 // NewAPIClient returns a new API Client
@@ -35,6 +36,11 @@ func NewAPIClient(url string) APIInterface {
 // SetTransport will set the http client round tripper
 func (c *APIClient) SetTransport(rt http.RoundTripper) {
 	c.HttpClient.Transport = rt
+}
+
+// GetHTTPClient will fetch the raw HTTP Client
+func (c *APIClient) GetHTTPClient() *http.Client {
+	return c.HttpClient
 }
 
 // GetTransport will get the http client round tripper

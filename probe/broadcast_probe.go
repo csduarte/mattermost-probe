@@ -15,19 +15,21 @@ import (
 
 // BroadcastProbe represents a test where the speaker will broadcast unique messages and the listener will check broadcast time.
 type BroadcastProbe struct {
+	Name          string
 	Speaker       *mattermost.Client
 	Listener      *mattermost.Client
-	Config        *config.BroadcastConfig
+	Config        config.BroadcastConfig
 	Messages      *util.MessageMap
 	EventChannel  chan *model.WebSocketEvent
-	TimingChannel chan metrics.TimingReport
+	TimingChannel chan metrics.Report
 	StopChannel   chan bool
 	Active        bool
 }
 
 // NewBroadcastProbe creates a new base probe
-func NewBroadcastProbe(c *config.BroadcastConfig, speaker, listener *mattermost.Client) *BroadcastProbe {
+func NewBroadcastProbe(c config.BroadcastConfig, speaker, listener *mattermost.Client) *BroadcastProbe {
 	bp := BroadcastProbe{
+		"Broadcast Probe",
 		speaker,
 		listener,
 		c,
@@ -64,7 +66,7 @@ func (bp *BroadcastProbe) Setup() error {
 	return nil
 }
 
-// Start will kick off the probe]\
+// Start will kick off the probe
 func (bp *BroadcastProbe) Start() error {
 
 	if bp.Active {
@@ -138,8 +140,8 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	end := time.Now()
 	start, _ := bp.Messages.Delete(uid)
 	if bp.TimingChannel != nil {
-		bp.TimingChannel <- metrics.TimingReport{
-			MetricName:      metrics.MetricProbeBroadcast,
+		bp.TimingChannel <- metrics.Report{
+			Route:           metrics.RouteBroadcastReceived,
 			DurationSeconds: end.Sub(start).Seconds(),
 		}
 	}
@@ -177,9 +179,8 @@ func (bp BroadcastProbe) reportOverdue() {
 	if bp.TimingChannel == nil {
 		return
 	}
-	bp.TimingChannel <- metrics.TimingReport{
-		MetricName:      metrics.MetricProbeBroadcast,
-		Path:            "",
+	bp.TimingChannel <- metrics.Report{
+		Route:           metrics.RouteBroadcastReceived,
 		DurationSeconds: 0,
 		Error:           fmt.Errorf("Message over cutoff %v", bp.Config.Cutoff),
 	}
@@ -194,4 +195,8 @@ func (bp *BroadcastProbe) CheckOverdue() {
 			bp.reportOverdue()
 		}
 	}
+}
+
+func (bp *BroadcastProbe) String() string {
+	return bp.Name
 }

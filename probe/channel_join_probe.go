@@ -11,15 +11,17 @@ import (
 
 // ChannelJoinProbe represent a user joining a channel
 type ChannelJoinProbe struct {
+	Name        string
 	Client      *mattermost.Client
-	Config      *config.ChannelJoinConfig
+	Config      config.ChannelJoinConfig
 	StopChannel chan bool
 	Active      bool
 }
 
 // NewChannelJoinProbe creates a channel joining probe
-func NewChannelJoinProbe(config *config.ChannelJoinConfig, client *mattermost.Client) *ChannelJoinProbe {
+func NewChannelJoinProbe(config config.ChannelJoinConfig, client *mattermost.Client) *ChannelJoinProbe {
 	p := ChannelJoinProbe{
+		Name:        "Channel Join Probe",
 		Client:      client,
 		Config:      config,
 		StopChannel: make(chan bool),
@@ -89,4 +91,8 @@ func (p *ChannelJoinProbe) joinChannel() {
 	if err != nil {
 		p.Client.LogError("Channel Join Error:", err.Error())
 	}
+}
+
+func (p *ChannelJoinProbe) String() string {
+	return p.Name
 }

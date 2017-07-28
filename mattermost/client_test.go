@@ -78,7 +78,7 @@ func (c *MockAPIClient) GetAuthToken() string {
 }
 
 func TestNewClient(t *testing.T) {
-	var tc chan metrics.TimingReport
+	var tc chan metrics.Report
 	var log logrus.Logger
 	mockID := "teamID"
 	c := NewClient("", mockID, tc, &log)
@@ -89,7 +89,7 @@ func TestNewClient(t *testing.T) {
 		t.Fatal("TimedRoundTripper should *not* be set without timing channel")
 	}
 
-	tc = make(chan metrics.TimingReport)
+	tc = make(chan metrics.Report)
 	c = NewClient("", "teamID", tc, &log)
 	if _, ok := c.API.GetTransport().(*metrics.TimedRoundTripper); !ok {
 		t.Fatal("TimedRoundTripper should be set")
