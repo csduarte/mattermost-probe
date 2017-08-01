@@ -1,0 +1,66 @@
+hash: 6b4b7013ebbfb2b733b831eb568e7a6718c55d0b188dbc03a6a6658bc4a4dc1f
+updated: 2017-04-11T06:20:30.96200187-07:00
+imports:
+- name: github.com/alecthomas/log4go
+  version: e5dc62318d9bd58682f1dceb53a4b24e8253682f
+- name: github.com/beorn7/perks
+  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  subpackages:
+  - quantile
+- name: github.com/golang/protobuf
+  version: df1d3ca07d2d07bba352d5b73c4313b4e2a6203e
+  subpackages:
+  - proto
+- name: github.com/gorilla/websocket
+  version: e8f0f8aaa98dfb6586cbdf2978d511e3199a960a
+- name: github.com/mattermost/platform
+  version: a12e7fdca439948ab097431d68e8f59778fbab81
+  subpackages:
+  - model
+- name: github.com/matttproud/golang_protobuf_extensions
+  version: 3247c84500bff8d9fb6d579d800f20b3e091582c
+  subpackages:
+  - pbutil
+- name: github.com/nicksnyder/go-i18n
+  version: 1c9e01733308fe876a840a54ce7633540b182a75
+  subpackages:
+  - i18n
+  - i18n/bundle
+  - i18n/language
+  - i18n/translation
+- name: github.com/pborman/uuid
+  version: a97ce2ca70fa5a848076093f05e639a89ca34d06
+- name: github.com/prometheus/client_golang
+  version: c5b7fccd204277076155f10851dad72b76a49317
+  subpackages:
+  - prometheus
+- name: github.com/prometheus/client_model
+  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  subpackages:
+  - go
+- name: github.com/prometheus/common
+  version: dd2f054febf4a6c00f2343686efb775948a8bff4
+  subpackages:
+  - expfmt
+  - internal/bitbucket.org/ww/goautoneg
+  - model
+- name: github.com/prometheus/procfs
+  version: 1878d9fbb537119d24b21ca07effd591627cd160
+- name: github.com/rifflock/lfshook
+  version: 1ae91782cf87524466b000ea12d8291ea48269be
+- name: github.com/satori/go.uuid
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
+- name: github.com/Sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: golang.org/x/crypto
+  version: 9477e0b78b9ac3d0b03822fd95422e2fe07627cd
+  subpackages:
+  - bcrypt
+  - blowfish
+- name: golang.org/x/sys
+  version: 8d1157a435470616f975ff9bb013bea8d0962067
+  subpackages:
+  - unix
+- name: gopkg.in/yaml.v2
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+testImports: []
