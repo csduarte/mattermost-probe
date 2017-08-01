@@ -21,7 +21,7 @@ type BroadcastProbe struct {
 	Config        config.BroadcastConfig
 	Messages      *util.MessageMap
 	EventChannel  chan *model.WebSocketEvent
-	TimingChannel chan metrics.Report
+	ReportChannel chan metrics.Report
 	StopChannel   chan bool
 	Active        bool
 }
@@ -139,8 +139,8 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	uid := post.Message
 	end := time.Now()
 	start, _ := bp.Messages.Delete(uid)
-	if bp.TimingChannel != nil {
-		bp.TimingChannel <- metrics.Report{
+	if bp.ReportChannel != nil {
+		bp.ReportChannel <- metrics.Report{
 			Route:           metrics.RouteBroadcastReceived,
 			DurationSeconds: end.Sub(start).Seconds(),
 		}
@@ -176,15 +176,14 @@ func (bp BroadcastProbe) GetSubscription() *mattermost.WebSocketSubscription {
 }
 
 func (bp BroadcastProbe) reportOverdue() {
-	if bp.TimingChannel == nil {
+	if bp.ReportChannel == nil {
 		return
 	}
-	bp.TimingChannel <- metrics.Report{
+	bp.ReportChannel <- metrics.Report{
 		Route:           metrics.RouteBroadcastReceived,
 		DurationSeconds: 0,
 		Error:           fmt.Errorf("Message over cutoff %v", bp.Config.Cutoff),
 	}
-
 }
 
 // CheckOverdue will handle any overdue messages

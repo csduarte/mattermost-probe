@@ -4,9 +4,6 @@ team_id: nuydp41iytfkzxaagdzobi74gc
 bind_address: 127.0.0.1
 port: 8067
 
-flags:
-  verbose: true
-
 user_a:
   email: probe1@test.com
   password: probe1
@@ -26,7 +23,7 @@ channel_join_probe:
   channel_name: super-test
 
 ping_probe:
-  enabled: true
+  enabled: true 
   frequency_sec: 1
   resources:
     - name: index_page_authenticated 
@@ -35,3 +32,18 @@ ping_probe:
     - name: index_page
       url: http://localhost:8065
       include_auth: false
+
+search_probe:
+  enabled: true
+  frequency_sec: 1
+  user_enabled: true 
+  user_minimum: 1
+  user_terms:
+    - dchristopher
+    - test
+    - NotThere
+  channel_enabled: true 
+  channel_minimum: 0
+  channel_terms:
+    - AChannelTheProbeIsNotAMember
+    - test 

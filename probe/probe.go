@@ -21,7 +21,7 @@ func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Cli
 	probes := []Probe{}
 	if cfg.BroadcastProbe.Enabled {
 		p := NewBroadcastProbe(cfg.BroadcastProbe, c1, c2)
-		p.TimingChannel = rc
+		p.ReportChannel = rc
 		probes = append(probes, p)
 	}
 
@@ -34,6 +34,13 @@ func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Cli
 		p := NewPingProbe(cfg.PingProbe, c1)
 		probes = append(probes, p)
 	}
+
+	if cfg.SearchProbe.Enabled {
+		p := NewSearchProbe(cfg.SearchProbe, c1)
+		p.ReportChannel = rc
+		probes = append(probes, p)
+	}
+
 	return probes
 }
 

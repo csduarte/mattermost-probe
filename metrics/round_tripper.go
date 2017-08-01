@@ -62,7 +62,7 @@ func (trt TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) 
 	}
 
 	var route string
-	if pingRoute := r.Header.Get("PingProbe"); len(pingRoute) > 0 {
+	if pingRoute := r.Header.Get("ProbeRouteOverride"); len(pingRoute) > 0 {
 		route = pingRoute
 	} else {
 		route = TokenizePath(r.URL.Path)
