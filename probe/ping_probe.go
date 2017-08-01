@@ -81,7 +81,10 @@ func (p *PingProbe) CheckResources() {
 		req.Header.Add("ProbeRouteOverride", r.Name)
 
 		// res, error caught on trainsport layer and counted
-		hc.Do(req)
+		res, httperr := hc.Do(req)
+		if httperr == nil {
+			res.Body.Close()
+		}
 	}
 }
 
