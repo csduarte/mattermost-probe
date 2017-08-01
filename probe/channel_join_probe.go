@@ -40,11 +40,11 @@ func (p *ChannelJoinProbe) Setup() error {
 		p.Client.LogInfo("Frequency cannot be set below 0.2, setting to default 1 sec")
 		p.Config.Frequency = 1
 	} else {
-		p.Client.LogInfo("Channel Join Frequency:", p.Config.Frequency, "seconds")
+		p.Client.LogInfo("Channel Join Frequency: %f seconds", p.Config.Frequency)
 	}
 
 	if len(p.Config.ChannelID) < 1 {
-		p.Client.LogInfo("No Channel ID set, attempting to fetch by ChannelName")
+		p.Client.LogInfo("No Channel ID set, attempting to fetch by ChannelName: %s", p.Config.ChannelName)
 		err := p.getChannelID(p.Config.ChannelName)
 		if err != nil {
 			return errors.Wrap(err, "could not get channel id")

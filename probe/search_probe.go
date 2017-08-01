@@ -31,7 +31,7 @@ type SearchProbe struct {
 // NewSearchProbe creates a channel joining probe
 func NewSearchProbe(config config.SearchConfig, client *mattermost.Client) *SearchProbe {
 	p := SearchProbe{
-		Name:           "Ping Probe",
+		Name:           "Search Probe",
 		Client:         client,
 		Config:         config,
 		StopChannel:    make(chan bool),
