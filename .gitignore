@@ -1,6 +1,6 @@
 .vscode/
-vendor/
 debug
+vendor/
 .DS_Store
 mattermost-probe
 mattermost-probe.log  

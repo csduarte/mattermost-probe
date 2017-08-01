@@ -41,7 +41,6 @@ search_probe:
   user_terms:
     - dchristopher
     - test
-    - NotThere
   channel_enabled: true 
   channel_minimum: 0
   channel_terms:

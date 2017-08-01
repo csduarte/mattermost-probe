@@ -78,7 +78,7 @@ func (p *PingProbe) CheckResources() {
 		if r.IncludeAuth {
 			req.Header.Add("Authorization", bearer)
 		}
-		req.Header.Add("PingProbe", r.Name)
+		req.Header.Add("ProbeRouteOverride", r.Name)
 
 		// res, error caught on trainsport layer and counted
 		hc.Do(req)
