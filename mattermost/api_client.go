@@ -20,6 +20,8 @@ type APIInterface interface {
 	JoinChannel(string) (*model.Result, *model.AppError)
 	GetFile(string) (io.ReadCloser, *model.AppError)
 	CreatePost(*model.Post) (*model.Result, *model.AppError)
+	SearchUsers(params model.UserSearch) (*model.Result, *model.AppError)
+	SearchMoreChannels(channelSearch model.ChannelSearch) (*model.Result, *model.AppError)
 	GetTeamID() string
 	SetTeamID(string)
 	SetTransport(http.RoundTripper)

@@ -46,6 +46,20 @@ func (c *MockAPIClient) JoinChannel(string) (*model.Result, *model.AppError) {
 	return &model.Result{Data: &model.Channel{}}, nil
 }
 
+func (c *MockAPIClient) SearchUsers(params model.UserSearch) (*model.Result, *model.AppError) {
+	if c.shouldFail {
+		return nil, model.NewLocAppError("", "", nil, "")
+	}
+	return &model.Result{Data: model.User{}}, nil
+}
+
+func (c *MockAPIClient) SearchMoreChannels(channelSearch model.ChannelSearch) (*model.Result, *model.AppError) {
+	if c.shouldFail {
+		return nil, model.NewLocAppError("", "", nil, "")
+	}
+	return &model.Result{Data: model.ChannelList{}}, nil
+}
+
 func (c *MockAPIClient) GetFile(string) (io.ReadCloser, *model.AppError) {
 	if c.shouldFail {
 		return nil, model.NewLocAppError("", "", nil, "")
@@ -75,6 +89,10 @@ func (c *MockAPIClient) GetTransport() http.RoundTripper {
 }
 func (c *MockAPIClient) GetAuthToken() string {
 	return ""
+}
+
+func (c *MockAPIClient) GetHTTPClient() *http.Client {
+	return nil
 }
 
 func TestNewClient(t *testing.T) {

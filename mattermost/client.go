@@ -91,6 +91,34 @@ func (c *Client) JoinChannel(id string) error {
 	return nil
 }
 
+// SearchChannels takes a term and returns a slice of MM channels.
+func (c *Client) SearchChannels(term string) (*model.ChannelList, error) {
+	cs := model.ChannelSearch{Term: term}
+	results, err := c.API.SearchMoreChannels(cs)
+	if err != nil {
+		return nil, err
+	}
+	cl, ok := results.Data.(*model.ChannelList)
+	if !ok {
+		return nil, fmt.Errorf("Client SearchChannel failed to assert channel list")
+	}
+	return cl, nil
+}
+
+// SearchUsers takes a term string and eturns a slice of MM Users.
+func (c *Client) SearchUsers(term string) ([]*model.User, error) {
+	us := model.UserSearch{Term: term}
+	results, err := c.API.SearchUsers(us)
+	if err != nil {
+		return nil, err
+	}
+	ul, ok := results.Data.([]*model.User)
+	if !ok {
+		return nil, fmt.Errorf("Client SearchUsers failed to assert user list")
+	}
+	return ul, nil
+}
+
 // GetFile will fetch a file by file ID
 func (c *Client) GetFile(id string) error {
 	if _, err := c.API.GetFile(id); err != nil {
