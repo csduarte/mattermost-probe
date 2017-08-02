@@ -81,6 +81,7 @@ func (p *ChannelJoinProbe) getChannelID(name string) error {
 	channel, err := p.Client.GetChannelByName(name)
 	if err != nil {
 		p.Client.LogError("Probe error", err.Error())
+		return err
 	}
 	p.Config.ChannelID = channel.Id
 	return nil

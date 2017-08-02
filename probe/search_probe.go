@@ -105,11 +105,13 @@ func (p *SearchProbe) Start() error {
 func (p *SearchProbe) SearchUsers() {
 	t := <-p.UserTermGen
 	min := p.Config.UserMinimum
-	// error caught by transport layer
-	users, _ := p.Client.SearchUsers(t)
+	users, err := p.Client.SearchUsers(t)
+	if err != nil {
+		p.Client.Log.Warnf("Search Probe failed on Client.SearchUsers(%s): %s", t, err.Error())
+		return
+	}
 	if len(users) < min {
 		p.ReportLowResults(searchUsers, t, len(users))
-		return
 	}
 	return
 }
@@ -118,7 +120,11 @@ func (p *SearchProbe) SearchChannels() {
 	t := <-p.ChannelTermGen
 	min := p.Config.ChannelMinimum
 	// error caught by transport layer
-	channels, _ := p.Client.SearchChannels(t)
+	channels, err := p.Client.SearchChannels(t)
+	if err != nil {
+		p.Client.Log.Warnf("Search Probe failed on Client.SearchChannels(%s): %s", t, err.Error())
+		return
+	}
 	cnt := len(*channels)
 	if cnt < min {
 		p.ReportLowResults(searchChannels, t, cnt)
