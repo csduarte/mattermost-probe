@@ -23,8 +23,11 @@ type WSInterface interface {
 // NewWSClient makes a WSInterface suitable websocket client
 func NewWSClient(url, token string) (WSInterface, *model.AppError) {
 	c, err := model.NewWebSocketClient(url, token)
+	if err != nil {
+		return nil, err
+	}
 	wsc := &WSClient{*c}
-	return wsc, err
+	return wsc, nil
 }
 
 // GetEventChannel will return mattermost ws event channel

@@ -2,6 +2,7 @@ package mattermost
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
@@ -70,7 +71,11 @@ func (c *Client) Login(creds config.Credentials) error {
 	if err != nil {
 		return err
 	}
-	c.User = results.Data.(*model.User)
+	data, ok := results.Data.(*model.User)
+	if !ok {
+		return fmt.Errorf("Login could not extract channel user data from response")
+	}
+	c.User = data
 	return nil
 }
 
@@ -80,7 +85,11 @@ func (c *Client) GetChannelByName(name string) (*model.Channel, error) {
 	if err != nil {
 		return nil, err
 	}
-	return results.Data.(*model.Channel), nil
+	data, ok := results.Data.(*model.Channel)
+	if !ok {
+		return nil, fmt.Errorf("GetChannelByName could not extract channel data from response")
+	}
+	return data, nil
 }
 
 // JoinChannel joines the client's user to a channel by channelID
@@ -100,7 +109,11 @@ func (c *Client) SearchChannels(term string) (*model.ChannelList, error) {
 	}
 	cl, ok := results.Data.(*model.ChannelList)
 	if !ok {
-		return nil, fmt.Errorf("Client SearchChannel failed to assert channel list")
+		return nil, fmt.Errorf("Client SearchChannel could not extract data from response")
+	}
+	val := reflect.ValueOf(cl)
+	if val.IsNil() {
+		return nil, fmt.Errorf("Client SearchChannels bad response caused nil channel list")
 	}
 	return cl, nil
 }
@@ -114,7 +127,7 @@ func (c *Client) SearchUsers(term string) ([]*model.User, error) {
 	}
 	ul, ok := results.Data.([]*model.User)
 	if !ok {
-		return nil, fmt.Errorf("Client SearchUsers failed to assert user list")
+		return nil, fmt.Errorf("Client SearchUsers could not extract data from response")
 	}
 	return ul, nil
 }
