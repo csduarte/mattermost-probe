@@ -30,7 +30,7 @@ func NewClient(url, teamID string, tc chan metrics.Report, log *logrus.Logger) *
 	}
 	c.API.SetTeamID(teamID)
 	if tc != nil {
-		c.API.SetTransport(metrics.NewTimedRoundTripper(tc, log))
+		c.API.SetTransport(metrics.NewTimedRoundTripper(tc, log, url))
 	}
 	return &c
 }

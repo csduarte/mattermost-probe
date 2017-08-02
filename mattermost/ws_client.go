@@ -1,6 +1,9 @@
 package mattermost
 
 import (
+	"net/http"
+
+	"github.com/gorilla/websocket"
 	"github.com/mattermost/platform/model"
 )
 
@@ -22,12 +25,37 @@ type WSInterface interface {
 
 // NewWSClient makes a WSInterface suitable websocket client
 func NewWSClient(url, token string) (WSInterface, *model.AppError) {
-	c, err := model.NewWebSocketClient(url, token)
+	c, err := newMattermostWebsocketClient(url, token)
 	if err != nil {
 		return nil, err
 	}
 	wsc := &WSClient{*c}
 	return wsc, nil
+}
+
+func newMattermostWebsocketClient(url, authToken string) (*model.WebSocketClient, *model.AppError) {
+	h := http.Header{
+		"Origin": []string{url},
+	}
+	conn, _, err := websocket.DefaultDialer.Dial(url+model.API_URL_SUFFIX+"/users/websocket", h)
+	if err != nil {
+		return nil, model.NewLocAppError("NewWebSocketClient", "model.websocket_client.connect_fail.app_error", nil, err.Error())
+	}
+
+	client := &model.WebSocketClient{
+		Url:             url,
+		ApiUrl:          url + model.API_URL_SUFFIX,
+		Conn:            conn,
+		AuthToken:       authToken,
+		Sequence:        1,
+		EventChannel:    make(chan *model.WebSocketEvent, 100),
+		ResponseChannel: make(chan *model.WebSocketResponse, 100),
+		ListenError:     nil,
+	}
+
+	client.SendMessage(model.WEBSOCKET_AUTHENTICATION_CHALLENGE, map[string]interface{}{"token": authToken})
+
+	return client, nil
 }
 
 // GetEventChannel will return mattermost ws event channel

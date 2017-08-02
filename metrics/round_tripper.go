@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -14,14 +15,16 @@ type TimedRoundTripper struct {
 	baseRoundTripper http.RoundTripper
 	reportChannel    chan Report
 	log              *logrus.Logger
+	origin           string
 }
 
 // NewTimedRoundTripper will create a new TimedRoundTripper
-func NewTimedRoundTripper(trc chan Report, log *logrus.Logger) *TimedRoundTripper {
+func NewTimedRoundTripper(trc chan Report, log *logrus.Logger, origin string) *TimedRoundTripper {
 	rt := TimedRoundTripper{
 		http.DefaultTransport,
 		trc,
 		log,
+		origin,
 	}
 
 	return &rt
@@ -29,6 +32,9 @@ func NewTimedRoundTripper(trc chan Report, log *logrus.Logger) *TimedRoundTrippe
 
 // RoundTrip will send off the response time to the report channel
 func (trt TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
+	if len(trt.origin) > 0 {
+		r.Header.Add("Origin", trt.origin)
+	}
 	requestStart := time.Now()
 	resp, err := trt.baseRoundTripper.RoundTrip(r)
 	requestEnd := time.Now()
@@ -53,8 +59,9 @@ func (trt TimedRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) 
 				body = string(data)
 			}
 		}
-		err = errors.New("Response code greater than 399, forcing error")
-		trt.log.Errorf("TimedRoundTripper detected response >= 400. Response Body: \n%q", body)
+		errMsg := fmt.Sprintf("TimedRoundTripper detected response >= 400. Response Code: %d Response Body: \n%q", resp.StatusCode, body)
+		err = errors.New(errMsg)
+		trt.log.Errorf(errMsg)
 	}
 
 	if time.Duration(requestDuration) > 10*time.Second {
