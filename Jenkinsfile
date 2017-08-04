@@ -3,7 +3,7 @@ node('golang') {
   def gitUrl = 'git@github.com:csduarte/mattermost-probe.git'
   def projectName = "mattermost-probe"
 	def date = new Date().format( 'yyMMdd' )
-  def filename = "${projectName}-${date}-${env.BUILD_NUMBER}"
+  def filename = "${projectName}.${date}.${env.BUILD_NUMBER}"
 
   deleteDir()
 
@@ -31,7 +31,8 @@ node('golang') {
 
 	stage('build') {
 		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
-			sh 'cd $WORKSPACE && go build -o ${filename} github.com/csduarte/mattermost-probe'
+			sh 'cd $WORKSPACE && go build github.com/csduarte/mattermost-probe'
+			sh "cp $WORKSPACE/src/github.com/csduarte/mattermost-probe/mattermost-probe ${filename}"
 		}
 	}
 
