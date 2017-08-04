@@ -1,5 +1,5 @@
 node('golang') {
-	def root = tool name: 'Go 1.8.1', type: 'go'
+	def root = tool name: 'Go 1.8', type: 'go'
 	def version = '0.1.5'
   def gitUrl = 'git@github.com:csduarte/mattermost-probe.git'
   def projectName = "mattermost-probe"
