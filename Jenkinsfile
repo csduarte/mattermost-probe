@@ -18,7 +18,7 @@ node('golang') {
 	stage('prep') {
 		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
 			sh 'go version'
-			sh "cd $WORKSPACE/src/github.com/csduarte/mattermost-probe && ${root}/bin/glide install"
+			sh "cd $WORKSPACE/src/github.com/csduarte/mattermost-probe && $JENKINS_HOME/go/bin/glide install"
 			sh 'if [[ ! -d $WORKSPACE/bin ]]; then mkdir $WORKSPACE/bin; fi; if [[ ! -d $WORKSPACE/pkg ]]; then mkdir $WORKSPACE/pkg; fi'
 		}
 	}
