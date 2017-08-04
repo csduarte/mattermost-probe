@@ -7,7 +7,6 @@ node('golang') {
 
   deleteDir()
 
-  git([url: gitUrl, branch: env.BRANCH_NAME, credentialsId: 'uchat-mobile-key'])
 	checkout([$class: 'GitSCM',
 		branches: [[name: '*/master']], 
 		doGenerateSubmoduleConfigurations: false, 
@@ -19,7 +18,7 @@ node('golang') {
 		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
 			sh 'go version'
 			sh "cd $WORKSPACE/src/github.com/csduarte/mattermost-probe && $JENKINS_HOME/go/bin/glide install"
-			sh "rm -rf $WORKSPACE/src/github.com/csduarte/mattermost-probe/vendor/github.com/mattermost/platform/vendor/github.com/gorilla/websocket"
+			sh "cd $WORKSPACE/src/github.com/csduarte/mattermost-probe && make .prebuild"
 			sh 'if [[ ! -d $WORKSPACE/bin ]]; then mkdir $WORKSPACE/bin; fi; if [[ ! -d $WORKSPACE/pkg ]]; then mkdir $WORKSPACE/pkg; fi'
 		}
 	}
