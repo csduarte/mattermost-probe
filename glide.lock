@@ -1,5 +1,5 @@
-hash: 6b4b7013ebbfb2b733b831eb568e7a6718c55d0b188dbc03a6a6658bc4a4dc1f
-updated: 2017-04-11T06:20:30.96200187-07:00
+hash: be68fb48a1333d4e088d616bf05d90a1ebf8e658ad5414f7abd60eb71a2abc87
+updated: 2017-08-04T14:41:41.937666985-07:00
 imports:
 - name: github.com/alecthomas/log4go
   version: e5dc62318d9bd58682f1dceb53a4b24e8253682f
@@ -14,7 +14,7 @@ imports:
 - name: github.com/gorilla/websocket
   version: e8f0f8aaa98dfb6586cbdf2978d511e3199a960a
 - name: github.com/mattermost/platform
-  version: a12e7fdca439948ab097431d68e8f59778fbab81
+  version: 584146b9b9b5d44359475f1b815b2306e130bbf2
   subpackages:
   - model
 - name: github.com/matttproud/golang_protobuf_extensions
@@ -30,6 +30,8 @@ imports:
   - i18n/translation
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -43,6 +45,7 @@ imports:
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
+  - log
   - model
 - name: github.com/prometheus/procfs
   version: 1878d9fbb537119d24b21ca07effd591627cd160
@@ -61,6 +64,9 @@ imports:
   version: 8d1157a435470616f975ff9bb013bea8d0962067
   subpackages:
   - unix
+  - windows
+  - windows/registry
+  - windows/svc/eventlog
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []
