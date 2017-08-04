@@ -2,7 +2,8 @@ node('golang') {
 	def root = tool name: 'Go 1.8', type: 'go'
   def gitUrl = 'git@github.com:csduarte/mattermost-probe.git'
   def projectName = "mattermost-probe"
-  def filename = "${applicationName}-${env.BUILD_NUMBER}"
+	def date = new Date().format( 'yyMMdd' )
+  def filename = "${projectName}-${date}-${env.BUILD_NUMBER}"
 
   deleteDir()
 
