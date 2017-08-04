@@ -1,13 +1,13 @@
 node('golang') {
-	def root = tool name: 'Go 1.7.5', type: 'go'
-	def version = '0.1.1'
+	def root = tool name: 'Go 1.8', type: 'go'
+	def version = '0.1.5'
+  def gitUrl = 'git@github.com:csduarte/mattermost-probe.git'
+  def projectName = "mattermost-probe"
+  def filename = "${applicationName}-${env.BUILD_NUMBER}"
 
-	checkout([$class: 'GitSCM',
-		branches: [[name: '*/master']], 
-		doGenerateSubmoduleConfigurations: false, 
-		extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'src/github.com/csduarte/mattermost-probe']], 
-		submoduleCfg: [], 
-		userRemoteConfigs: [[credentialsId: 'git-key',url: 'git@github.com:uberdeploy/mattermost-probe.git']]])
+  deleteDir()
+
+  git([url: gitUrl, branch: env.BRANCH_NAME, credentialsId: 'uchat-mobile-key'])
 
 	stage('prep') {
 		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
@@ -17,14 +17,24 @@ node('golang') {
 		}
 	}
 
+	stage('test') {
+		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
+			sh 'cd $WORKSPACE && go test github.com/csduarte/mattermost-probe/mattermost  '
+		}
+	}
+
 	stage('build') {
 		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
-			sh 'cd $WORKSPACE && go build github.com/csduarte/mattermost-probe'
+			sh 'cd $WORKSPACE && go build -o ${filename} github.com/csduarte/mattermost-probe'
 		}
 	}
 
 	stage('publish') {
-		nexusArtifactUploader artifacts: [[artifactId: 'mattermost-probe', classifier: '', file: 'mattermost-probe', type: 'bin']], credentialsId: 'nexus-deploy', groupId: 'com.github.uberdeploy.mattermost-probe', nexusUrl: 'nexus:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: version
+    archiveArtifacts artifacts: filename, fingerprint: true
+      
+    withAWS(credentials: 'aws-uchat-releases', region: 'us-west-2') {
+      s3Upload  bucket: 'uchat-releases',
+                file: filename, 
+                path: "${projectName}/${env.BRANCH_NAME}/${filename}" 
 	}
 }
-
