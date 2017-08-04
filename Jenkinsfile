@@ -1,6 +1,5 @@
 node('golang') {
 	def root = tool name: 'Go 1.8', type: 'go'
-	def version = '0.1.5'
   def gitUrl = 'git@github.com:csduarte/mattermost-probe.git'
   def projectName = "mattermost-probe"
   def filename = "${applicationName}-${env.BUILD_NUMBER}"
@@ -35,6 +34,7 @@ node('golang') {
     withAWS(credentials: 'aws-uchat-releases', region: 'us-west-2') {
       s3Upload  bucket: 'uchat-releases',
                 file: filename, 
-                path: "${projectName}/${env.BRANCH_NAME}/${filename}" 
+                path: "${projectName}/${env.BRANCH_NAME}/${filename}"
+		} 
 	}
 }
