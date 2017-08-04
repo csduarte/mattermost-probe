@@ -8,6 +8,12 @@ node('golang') {
   deleteDir()
 
   git([url: gitUrl, branch: env.BRANCH_NAME, credentialsId: 'uchat-mobile-key'])
+	checkout([$class: 'GitSCM',
+		branches: [[name: '*/master']], 
+		doGenerateSubmoduleConfigurations: false, 
+		extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'src/github.com/csduarte/mattermost-probe']], 
+		submoduleCfg: [], 
+		userRemoteConfigs: [[credentialsId: 'uchat-mobile-key',url: gitUrl]]])
 
 	stage('prep') {
 		withEnv(["GOROOT=${root}", "GOPATH=${WORKSPACE}", "PATH+GO=${root}/bin"]) {
