@@ -1,9 +1,9 @@
 node('golang') {
-	def root 			= tool name: 'Go 1.8', type: 'go'
-  def gitUrl 		= 'git@github.com:csduarte/mattermost-probe.git'
-  def project 	= "mattermost-probe"
-	def bucket 		= "uchat-releases"
-	def date 			= new Date().format( 'yyMMdd' )
+	def root			= tool name: 'Go 1.8', type: 'go'
+  def gitUrl		= 'git@github.com:csduarte/mattermost-probe.git'
+  def project		= "mattermost-probe"
+	def bucket		= "uchat-releases"
+	def date			= new Date().format( 'yyMMdd' )
   def filename	= "${project}-${date}-${env.BUILD_NUMBER}"
 
   deleteDir()
