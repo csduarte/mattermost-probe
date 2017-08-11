@@ -138,11 +138,19 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	post := model.PostFromJson(strings.NewReader(event.Data["post"].(string)))
 	uid := post.Message
 	end := time.Now()
-	start, _ := bp.Messages.Delete(uid)
+	start, ok := bp.Messages.Delete(uid)
 	if bp.ReportChannel != nil {
-		bp.ReportChannel <- metrics.Report{
-			Route:           metrics.RouteBroadcastReceived,
-			DurationSeconds: end.Sub(start).Seconds(),
+		if !ok {
+			bp.ReportChannel <- metrics.Report{
+				Route:           metrics.RouteBroadcastReceived,
+				DurationSeconds: 0,
+				Error:           fmt.Errorf("Failed to find uid %q", uid),
+			}
+		} else {
+			bp.ReportChannel <- metrics.Report{
+				Route:           metrics.RouteBroadcastReceived,
+				DurationSeconds: end.Sub(start).Seconds(),
+			}
 		}
 	}
 }
