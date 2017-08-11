@@ -1,9 +1,10 @@
 node('golang') {
-	def root = tool name: 'Go 1.8', type: 'go'
-  def gitUrl = 'git@github.com:csduarte/mattermost-probe.git'
-  def projectName = "mattermost-probe"
-	def date = new Date().format( 'yyMMdd' )
-  def filename = "${projectName}-${date}-${env.BUILD_NUMBER}"
+	def root 			= tool name: 'Go 1.8', type: 'go'
+  def gitUrl 		= 'git@github.com:csduarte/mattermost-probe.git'
+  def project 	= "mattermost-probe"
+	def bucket 		= "uchat-releases"
+	def date 			= new Date().format( 'yyMMdd' )
+  def filename	= "${project}-${date}-${env.BUILD_NUMBER}"
 
   deleteDir()
 
@@ -40,9 +41,9 @@ node('golang') {
     archiveArtifacts artifacts: filename, fingerprint: true
       
     withAWS(credentials: 'aws-uchat-releases', region: 'us-west-2') {
-      s3Upload  bucket: 'uchat-releases',
-                file: filename, 
-                path: "${projectName}/${env.BRANCH_NAME}/${filename}"
+      s3Upload  bucket: bucket,
+                file: 	filename, 
+                path: 	"${project}/${env.BRANCH_NAME}/${filename}"
 		} 
 	}
 }
