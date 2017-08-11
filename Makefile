@@ -14,7 +14,7 @@ build-osx: .prebuild
 
 build-windows: .prebuild
 	@echo Build Windows amd64
-	env GOOS=windows GOARCH=amd64 $(GO)  .
+	env GOOS=windows GOARCH=amd64 $(GO) install .
 
 install:
 	glide install
