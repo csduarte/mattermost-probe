@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Sirupsen/logrus"
+
 	"github.com/csduarte/mattermost-probe/config"
 	"github.com/csduarte/mattermost-probe/mattermost"
 	"github.com/csduarte/mattermost-probe/metrics"
@@ -141,11 +143,10 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	start, ok := bp.Messages.Delete(uid)
 	if bp.ReportChannel != nil {
 		if !ok {
-			bp.ReportChannel <- metrics.Report{
-				Route:           metrics.RouteBroadcastReceived,
-				DurationSeconds: 0,
-				Error:           fmt.Errorf("Failed to find uid %q", uid),
-			}
+			bp.Speaker.Log.WithFields(logrus.Fields{
+				"GUID":  uid,
+				"Route": metrics.RouteBroadcastReceived,
+			}).Warn("failed to find uid in probe message map")
 		} else {
 			bp.ReportChannel <- metrics.Report{
 				Route:           metrics.RouteBroadcastReceived,

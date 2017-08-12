@@ -6,10 +6,11 @@ import (
 )
 
 type FlagsConfig struct {
-	ConfigLocation  string `yaml:"config"`
-	MetricsLocation string `yaml:"metrics_location"`
-	LogLocation     string `yaml:"log_location"`
-	Verbose         bool   `yaml:"verbose"`
+	ConfigLocation  string   `yaml:"config"`
+	MetricsLocation string   `yaml:"metrics_location"`
+	LogLocation     string   `yaml:"log_location"`
+	Verbose         bool     `yaml:"verbose"`
+	Args            []string `yaml:"args"`
 }
 
 func (c FlagsConfig) String() string {
@@ -33,5 +34,6 @@ func GetFlags() FlagsConfig {
 	flag.StringVar(&c.MetricsLocation, "metrics", "", "Metric Log Location including filename")
 	flag.BoolVar(&c.Verbose, "verbose", false, "Set Log level to debug")
 	flag.Parse()
+	c.Args = flag.Args()
 	return c
 }
