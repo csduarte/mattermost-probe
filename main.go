@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
@@ -23,7 +24,19 @@ func applicationStart() {
 	//TODO: Add PID check for multiple process
 
 	flagConfig := config.GetFlags()
+	log.Info("Application Started")
 	log.Info(flagConfig)
+
+	args := flagConfig.Args
+	if len(args) > 0 {
+		if strings.ToLower(args[0]) == "version" {
+			log.Infof("Version X.X.X")
+			os.Exit(0)
+		} else {
+			log.Errorf("application launched with unrecognized arguments %q", args)
+			os.Exit(1)
+		}
+	}
 
 	var log *logrus.Logger
 	log, err := util.NewFileLogger(flagConfig.LogLocation, flagConfig.Verbose)

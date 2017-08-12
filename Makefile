@@ -1,4 +1,4 @@
-.PHONY: build build-linux build-osx build-windows install 
+.PHONY: build build-linux build-osx build-windows install run
 
 GO=go
 
@@ -15,6 +15,11 @@ build-osx: .prebuild
 build-windows: .prebuild
 	@echo Build Windows amd64
 	env GOOS=windows GOARCH=amd64 $(GO) install .
+
+run: .prebuild
+	@echo Building and Running
+	$(GO) build
+	./mattermost-probe	 
 
 install:
 	glide install
