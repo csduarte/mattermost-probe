@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/csduarte/mattermost-probe/metrics"
 	"github.com/csduarte/mattermost-probe/probe"
 	"github.com/csduarte/mattermost-probe/util"
-	"github.com/prometheus/common/log"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -24,33 +24,35 @@ func applicationStart() {
 	//TODO: Add PID check for multiple process
 
 	flagConfig := config.GetFlags()
-	log.Info("Application Started")
-	log.Info(flagConfig)
+	log.Println("Application Started")
+	log.Println(flagConfig)
 
 	args := flagConfig.Args
 	if len(args) > 0 {
 		if strings.ToLower(args[0]) == "version" {
-			log.Infof("Version X.X.X")
+			log.Println("Version X.X.X")
 			os.Exit(0)
 		} else {
-			log.Errorf("application launched with unrecognized arguments %q", args)
+			log.Printf("application launched with unrecognized arguments %q\n", args)
 			os.Exit(1)
 		}
 	}
 
 	var log *logrus.Logger
-	log, err := util.NewFileLogger(flagConfig.LogLocation, flagConfig.Verbose)
+	log, err := util.NewFileLogger(flagConfig.LogLocation)
 	if err != nil {
 		applicationExit(log, err.Error())
 	}
 
 	var mlog *logrus.Logger
 	if len(flagConfig.MetricsLocation) > 0 {
-		mlog, err = util.NewFileLogger(flagConfig.MetricsLocation, false)
+		mlog, err = util.NewFileLogger(flagConfig.MetricsLocation)
 		if err != nil {
 			applicationExit(log, err.Error())
 		}
 	}
+
+	log.Info("Flag Config", flagConfig)
 
 	cfg := config.Config{}
 	file, err := ioutil.ReadFile(flagConfig.ConfigLocation)

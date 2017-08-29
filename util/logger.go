@@ -10,22 +10,22 @@ import (
 )
 
 // NewFileLogger will create a zap loger with essential config changes
-func NewFileLogger(path string, verbose bool) (*logrus.Logger, error) {
+func NewFileLogger(path string) (*logrus.Logger, error) {
 	if err := ensureFile(path); err != nil {
 		msg := fmt.Sprintf("Failed to find/create log file at %q", path)
 		return nil, errors.Wrap(err, msg)
 	}
 	log := logrus.New()
-	var lvl logrus.Level
-	if verbose {
-		log.Level = logrus.DebugLevel
-		lvl = logrus.DebugLevel
-	} else {
-		log.Level = logrus.InfoLevel
-		lvl = logrus.InfoLevel
-	}
+	log.Level = logrus.InfoLevel
 
-	fileHook := lfshook.NewHook(lfshook.PathMap{lvl: path})
+	fileHook := lfshook.NewHook(lfshook.PathMap{
+		logrus.ErrorLevel: path,
+		logrus.InfoLevel:  path,
+		logrus.DebugLevel: path,
+		logrus.PanicLevel: path,
+		logrus.FatalLevel: path,
+		logrus.WarnLevel:  path,
+	})
 	fileHook.SetFormatter(&logrus.JSONFormatter{})
 	log.Hooks.Add(fileHook)
 
