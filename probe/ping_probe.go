@@ -74,6 +74,7 @@ func (p *PingProbe) CheckResources() {
 		req, err := http.NewRequest("GET", r.URL, nil)
 		if err != nil {
 			p.Client.LogError("failed to form ping request to %s: %s", r.URL, err.Error())
+			continue
 		}
 		if r.IncludeAuth {
 			req.Header.Add("Authorization", bearer)

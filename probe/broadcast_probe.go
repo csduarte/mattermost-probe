@@ -160,6 +160,7 @@ func (bp *BroadcastProbe) getChannelID(name string) error {
 	channel, err := bp.Speaker.GetChannelByName(name)
 	if err != nil {
 		bp.Speaker.LogError("Probe error", err.Error())
+		return err
 	}
 
 	bp.Config.ChannelID = channel.Id
