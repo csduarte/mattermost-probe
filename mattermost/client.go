@@ -3,6 +3,7 @@ package mattermost
 import (
 	"fmt"
 	"reflect"
+	"sync"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
@@ -12,11 +13,12 @@ import (
 
 // Client structure holds mattermost api, websocket, and user objects
 type Client struct {
-	API  APIInterface
-	WS   WSInterface
-	User *model.User
-	Subs []*WebSocketSubscription
-	Log  *logrus.Logger
+	API     APIInterface
+	WS      WSInterface
+	User    *model.User
+	Subs    []*WebSocketSubscription
+	SubLock sync.RWMutex
+	Log     *logrus.Logger
 }
 
 // NewClient generateds a new API and WebSocket Client}
@@ -26,6 +28,7 @@ func NewClient(url, teamID string, tc chan metrics.Report, log *logrus.Logger) *
 		nil,
 		nil,
 		[]*WebSocketSubscription{},
+		sync.RWMutex{},
 		log,
 	}
 	c.API.SetTeamID(teamID)
@@ -45,17 +48,23 @@ func (c *Client) Establish(socketURL string, creds config.Credentials) error {
 		return fmt.Errorf("Failed to login: %v", err.Error())
 	}
 
+	// A empty socket url indicates no desire to connect to websocket
+	if len(socketURL) == 0 {
+		return nil
+	}
+
 	if err := c.CreateWS(socketURL); err != nil {
 		return fmt.Errorf("Failed to connect ws: %v", err.Error())
 	}
+
 	c.StartWS()
 	return nil
 }
 
-// Listen will prompt the websocket to start a listening routine
-func (c *Client) Listen() {
-	c.StartWS()
-}
+// // Listen will prompt the websocket to start a listening routine
+// func (c *Client) Listen() {
+// 	c.StartWS()
+// }
 
 // PingAPI will call the ping endpoint
 func (c *Client) PingAPI() error {
