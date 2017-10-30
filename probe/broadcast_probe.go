@@ -141,18 +141,39 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	uid := post.Message
 	end := time.Now()
 	start, ok := bp.Messages.Delete(uid)
-	if bp.ReportChannel != nil {
-		if !ok {
-			bp.Speaker.Log.WithFields(logrus.Fields{
-				"GUID":  uid,
-				"Route": metrics.RouteBroadcastReceived,
-			}).Warn("failed to find uid in probe message map")
-		} else {
-			bp.ReportChannel <- metrics.Report{
-				Route:           metrics.RouteBroadcastReceived,
-				DurationSeconds: end.Sub(start).Seconds(),
-			}
-		}
+	if !ok {
+		bp.Speaker.Log.WithFields(logrus.Fields{
+			"GUID":  uid,
+			"Route": metrics.RouteBroadcastReceived,
+		}).Warn("failed to find uid in probe message map")
+		return
+	}
+
+	duration := end.Sub(start).Seconds()
+	// Sanity protection for times, possible bad result from Message.Delete
+	if duration >= bp.Config.Cutoff*2 || duration < 0 {
+		bp.Messages.RLock()
+		bp.Speaker.Log.WithFields(logrus.Fields{
+			"GUID":     uid,
+			"Route":    metrics.RouteBroadcastReceived,
+			"messages": bp.Messages.Items,
+			"start":    start,
+			"end":      end,
+			"ok":       ok,
+			"post":     post,
+		}).Warn("consistenty error - message length twice as long as cutoff")
+		bp.Messages.RUnlock()
+		return
+	}
+
+	if bp.ReportChannel == nil {
+		bp.Speaker.Log.Warn("No action from BroadcastProbe handleEvent")
+		return
+	}
+
+	bp.ReportChannel <- metrics.Report{
+		Route:           metrics.RouteBroadcastReceived,
+		DurationSeconds: duration,
 	}
 }
 
