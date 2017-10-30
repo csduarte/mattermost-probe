@@ -48,5 +48,5 @@ search_probe:
     - test 
 
 login_probe:
-  enable: true
+  enabled: true
   frequency_sec: 5

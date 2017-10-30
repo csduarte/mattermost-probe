@@ -142,10 +142,10 @@ func (bp *BroadcastProbe) handleEvent(event *model.WebSocketEvent) {
 	end := time.Now()
 	start, ok := bp.Messages.Delete(uid)
 	if !ok {
-		bp.Speaker.Log.WithFields(logrus.Fields{
-			"GUID":  uid,
-			"Route": metrics.RouteBroadcastReceived,
-		}).Warn("failed to find uid in probe message map")
+		// bp.Speaker.Log.WithFields(logrus.Fields{
+		// 	"GUID":  uid,
+		// 	"Route": metrics.RouteBroadcastReceived,
+		// }).Warn("UUID lookup failed, are there duplica")
 		return
 	}
 
