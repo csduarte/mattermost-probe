@@ -43,9 +43,8 @@ func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Cli
 	}
 
 	if cfg.LoginProbe.Enabled {
-		p1 := NewLoginProbe(cfg.LoginProbe, c1, cfg.UserA)
-		p2 := NewLoginProbe(cfg.LoginProbe, c2, cfg.UserB)
-		probes = append(probes, p1, p2)
+		p := NewLoginProbe(cfg.LoginProbe, c1, cfg.UserA)
+		probes = append(probes, p)
 	}
 
 	if cfg.APIPingProbe.Enabled {

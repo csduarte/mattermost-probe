@@ -40,7 +40,7 @@ func (p *ChannelJoinProbe) Setup() error {
 		p.Client.LogInfo("Frequency cannot be set below 0.2, setting to default 1 sec")
 		p.Config.Frequency = 1
 	} else {
-		p.Client.LogInfo("Channel Join Frequency: %f seconds", p.Config.Frequency)
+		p.Client.LogInfo("%s Frequency: %v seconds", p.Name, p.Config.Frequency)
 	}
 
 	if len(p.Config.ChannelID) < 1 {

@@ -37,7 +37,7 @@ func (p *LoginProbe) Setup() error {
 		p.Client.LogInfo("Frequency cannot be set below 1, setting to default 5 sec")
 		p.Config.Frequency = 5
 	} else {
-		p.Client.LogInfo("Login Frequency: %v seconds", p.Config.Frequency)
+		p.Client.LogInfo("%s Frequency: %v seconds", p.Name, p.Config.Frequency)
 	}
 
 	return nil
