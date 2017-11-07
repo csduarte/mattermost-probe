@@ -17,6 +17,7 @@ type Probe interface {
 	Start() error
 }
 
+// NewProbes takes configs, report channel and the client objects and creates each probe.
 func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Client) []Probe {
 	probes := []Probe{}
 	if cfg.BroadcastProbe.Enabled {
@@ -42,14 +43,19 @@ func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Cli
 	}
 
 	if cfg.LoginProbe.Enabled {
-		p1 := NewLoginProbe(cfg.LoginProbe, c1, cfg.UserA)
-		p2 := NewLoginProbe(cfg.LoginProbe, c2, cfg.UserB)
-		probes = append(probes, p1, p2)
+		p := NewLoginProbe(cfg.LoginProbe, c1, cfg.UserA)
+		probes = append(probes, p)
+	}
+
+	if cfg.APIPingProbe.Enabled {
+		p := NewAPIPingProbe(cfg.APIPingProbe, c1)
+		probes = append(probes, p)
 	}
 
 	return probes
 }
 
+// SetupProbes simply calls setup on each of the probes that were initialized
 func SetupProbes(probes []Probe, log *logrus.Logger) error {
 	for _, p := range probes {
 		log.Infof("Setting up probe: %s", p.String())
@@ -60,6 +66,7 @@ func SetupProbes(probes []Probe, log *logrus.Logger) error {
 	return nil
 }
 
+// StartProbes will call the start method of each probe, blocks app start up if any fail
 func StartProbes(probes []Probe, log *logrus.Logger) error {
 	for _, p := range probes {
 		log.Infof("Starting probe: %s", p.String())

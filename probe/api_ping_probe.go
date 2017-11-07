@@ -7,22 +7,20 @@ import (
 	"github.com/csduarte/mattermost-probe/mattermost"
 )
 
-// LoginProbe represent will do
-type LoginProbe struct {
+// APIPingProbe represent will do
+type APIPingProbe struct {
 	Name        string
 	Client      *mattermost.Client
-	Credentials config.Credentials
-	Config      config.LoginProbeConfig
+	Config      config.APIPingConfig
 	StopChannel chan bool
 	Active      bool
 }
 
-// NewLoginProbe creates a channel joining probe
-func NewLoginProbe(config config.LoginProbeConfig, client *mattermost.Client, creds config.Credentials) *LoginProbe {
-	p := LoginProbe{
-		Name:        "Login Probe",
+// NewAPIPingProbe creates a channel joining probe
+func NewAPIPingProbe(config config.APIPingConfig, client *mattermost.Client) *APIPingProbe {
+	p := APIPingProbe{
+		Name:        "API Ping Probe",
 		Client:      client,
-		Credentials: creds,
 		Config:      config,
 		StopChannel: make(chan bool),
 		Active:      false,
@@ -31,11 +29,11 @@ func NewLoginProbe(config config.LoginProbeConfig, client *mattermost.Client, cr
 }
 
 // Setup will run once on application starts
-func (p *LoginProbe) Setup() error {
+func (p *APIPingProbe) Setup() error {
 
-	if p.Config.Frequency < 1 {
-		p.Client.LogInfo("Frequency cannot be set below 1, setting to default 5 sec")
-		p.Config.Frequency = 5
+	if p.Config.Frequency < 0.2 {
+		p.Client.LogInfo("Frequency cannot be set below 0.2, setting to default 1 sec")
+		p.Config.Frequency = 1
 	} else {
 		p.Client.LogInfo("%s Frequency: %v seconds", p.Name, p.Config.Frequency)
 	}
@@ -44,7 +42,7 @@ func (p *LoginProbe) Setup() error {
 }
 
 // Start will kick off the probe
-func (p *LoginProbe) Start() error {
+func (p *APIPingProbe) Start() error {
 	if p.Active {
 		return nil
 	}
@@ -57,7 +55,7 @@ func (p *LoginProbe) Start() error {
 			case <-p.StopChannel:
 				return
 			case <-writeTicker.C:
-				go p.Login()
+				go p.PingAPI()
 			}
 		}
 	}()
@@ -66,11 +64,14 @@ func (p *LoginProbe) Start() error {
 	return nil
 }
 
-// Login will fire off a attempt to auth against server, errors are caught by transport layer
-func (p *LoginProbe) Login() {
-	p.Client.Login(p.Credentials)
+// PingAPI call client api
+func (p *APIPingProbe) PingAPI() {
+	err := p.Client.PingAPI()
+	if err != nil {
+		p.Client.LogError("failed to ping api - %s", err.Error())
+	}
 }
 
-func (p *LoginProbe) String() string {
+func (p *APIPingProbe) String() string {
 	return p.Name
 }
