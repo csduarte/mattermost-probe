@@ -15,7 +15,8 @@ type Config struct {
 	BroadcastProbe   BroadcastConfig   `yaml:"broadcast_probe"`
 	ChannelJoinProbe ChannelJoinConfig `yaml:"channel_join_probe"`
 	SearchProbe      SearchConfig      `yaml:"search_probe"`
-	LoginProbe       LoginProbe        `yaml:"login_probe"`
+	LoginProbe       LoginProbeConfig  `yaml:"login_probe"`
+	APIPingProbe     APIPingConfig     `yaml:"api_ping_probe"`
 }
 
 // Validate will ensure that all required values are or default values are set

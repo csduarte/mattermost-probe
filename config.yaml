@@ -44,8 +44,12 @@ search_probe:
   channel_enabled: true 
   channel_minimum: 0
   channel_terms:
-    - AChannelTheProbeIsNotAMember
-    - test 
+    - AChannelThePrbeIsNotAMember
+    - test
+
+api_ping_probe:
+  enabled: true
+  frequency_set: 1
 
 login_probe:
   enabled: true

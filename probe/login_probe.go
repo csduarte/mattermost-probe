@@ -12,15 +12,15 @@ type LoginProbe struct {
 	Name        string
 	Client      *mattermost.Client
 	Credentials config.Credentials
-	Config      config.LoginProbe
+	Config      config.LoginProbeConfig
 	StopChannel chan bool
 	Active      bool
 }
 
 // NewLoginProbe creates a channel joining probe
-func NewLoginProbe(config config.LoginProbe, client *mattermost.Client, creds config.Credentials) *LoginProbe {
+func NewLoginProbe(config config.LoginProbeConfig, client *mattermost.Client, creds config.Credentials) *LoginProbe {
 	p := LoginProbe{
-		Name:        "Ping Probe",
+		Name:        "Login Probe",
 		Client:      client,
 		Credentials: creds,
 		Config:      config,
@@ -37,7 +37,7 @@ func (p *LoginProbe) Setup() error {
 		p.Client.LogInfo("Frequency cannot be set below 1, setting to default 5 sec")
 		p.Config.Frequency = 5
 	} else {
-		p.Client.LogInfo("Ping Frequency: %v seconds", p.Config.Frequency)
+		p.Client.LogInfo("Login Frequency: %v seconds", p.Config.Frequency)
 	}
 
 	return nil
