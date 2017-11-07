@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,19 +25,21 @@ func applicationStart() {
 	//TODO: Add PID check for multiple process
 
 	flagConfig := config.GetFlags()
-	log.Println("Application Started")
-	log.Println(flagConfig)
 
 	args := flagConfig.Args
 	if len(args) > 0 {
 		if strings.ToLower(args[0]) == "version" {
-			log.Println("Version X.X.X")
+			fmt.Println(Version)
 			os.Exit(0)
 		} else {
 			log.Printf("application launched with unrecognized arguments %q\n", args)
 			os.Exit(1)
 		}
 	}
+
+	log.Println("Application Started")
+	log.Println("Version:", Version)
+	log.Println(flagConfig)
 
 	var log *logrus.Logger
 	log, err := util.NewFileLogger(flagConfig.LogLocation)

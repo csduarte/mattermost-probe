@@ -31,7 +31,7 @@ func (mm *MessageMap) Get(key string) (time.Time, bool) {
 	return val, ok
 }
 
-// Delete reoves key if can be found, otherwise returns false
+// Delete removes key if can be found, otherwise returns false
 func (mm *MessageMap) Delete(key string) (time.Time, bool) {
 	mm.Lock()
 	defer mm.Unlock()

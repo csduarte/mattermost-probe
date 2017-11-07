@@ -46,3 +46,7 @@ search_probe:
   channel_terms:
     - AChannelTheProbeIsNotAMember
     - test 
+
+login_probe:
+  enabled: true
+  frequency_sec: 5

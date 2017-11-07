@@ -35,6 +35,8 @@ func (c *Client) StartWS() {
 
 func (c *Client) handleWSEvent(event *model.WebSocketEvent) {
 	// TODO: Stamp Event incoming time, instead of doing it in each probe
+	c.SubLock.RLock()
+	defer c.SubLock.RUnlock()
 	for _, wss := range c.Subs {
 		if wss.ShouldNotify(event) {
 			wss.Emit(event)
@@ -44,6 +46,8 @@ func (c *Client) handleWSEvent(event *model.WebSocketEvent) {
 
 // AddSubscription will add the subscription probe to the subs for this client
 func (c *Client) AddSubscription(s Subscriber) {
+	c.SubLock.Lock()
+	defer c.SubLock.Unlock()
 	c.Subs = append(c.Subs, s.GetSubscription())
 }
 
