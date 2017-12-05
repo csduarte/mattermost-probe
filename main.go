@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
@@ -17,12 +19,20 @@ import (
 )
 
 func main() {
+
+	var osSignal = make(chan os.Signal)
+	signal.Notify(osSignal, syscall.SIGTERM)
+	signal.Notify(osSignal, syscall.SIGINT)
+
 	applicationStart()
-	select {}
+
+	select {
+	case sig := <-osSignal:
+		log.Printf("Application closing from sig %s", sig)
+	}
 }
 
 func applicationStart() {
-	//TODO: Add PID check for multiple process
 
 	flagConfig := config.GetFlags()
 
@@ -85,10 +95,10 @@ func applicationStart() {
 
 	probes := probe.NewProbes(cfg, server.ReportChannel, c1, c2)
 	if err := probe.SetupProbes(probes, log); err != nil {
-		applicationExit(log, err.Error())
+		applicationExit(log, "Failed to setup probes - %s", err.Error())
 	}
 	if err := probe.StartProbes(probes, log); err != nil {
-		applicationExit(log, err.Error())
+		applicationExit(log, "Failed to start probes - %s", err.Error())
 	}
 	if len(probes) == 0 {
 		log.Warn("No probes enabled.")

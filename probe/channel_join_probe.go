@@ -80,7 +80,7 @@ func (p *ChannelJoinProbe) Start() error {
 func (p *ChannelJoinProbe) getChannelID(name string) error {
 	channel, err := p.Client.GetChannelByName(name)
 	if err != nil {
-		p.Client.LogError("Probe error", err.Error())
+		p.Client.LogError("probe error - %s", err.Error())
 		return err
 	}
 	p.Config.ChannelID = channel.Id
@@ -90,7 +90,7 @@ func (p *ChannelJoinProbe) getChannelID(name string) error {
 func (p *ChannelJoinProbe) joinChannel() {
 	err := p.Client.JoinChannel(p.Config.ChannelID)
 	if err != nil {
-		p.Client.LogError("Channel Join Error:", err.Error())
+		p.Client.LogError("channel join error - %s", err.Error())
 	}
 }
 

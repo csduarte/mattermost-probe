@@ -54,25 +54,23 @@ func (c *Client) AddSubscription(s Subscriber) {
 func (c *Client) handleWSError() {
 	retryCount := 0
 	if c.WS.GetListenError() != nil {
-		c.LogError("Main WebSocket Error: - %v\n", c.WS.GetListenError().Error())
+		c.LogError("Main WebSocket Error: - %s\n", c.WS.GetListenError().Error())
 	} else {
 		c.LogError("Main WebSocket Error: - Connection closed from server")
 	}
 	for {
 		if retryCount > 0 {
+			c.LogInfo("Sleeping for %d seconds before socket reconnect attempt", retryCount)
 			time.Sleep(time.Duration(retryCount) * time.Second)
 		}
-		ec := make(chan *model.WebSocketEvent, 100)
-		rc := make(chan *model.WebSocketResponse, 100)
-		c.WS.SetEventChannel(ec)
-		c.WS.SetResponseChannel(rc)
-		c.LogError("WebSocket attempting to reconnect")
+		c.LogInfo("WebSocket attempting to reconnect")
 		if err := c.WS.Connect(); err != nil {
+			c.LogInfo("Retry WebSocket Error: - %s\n", err.Error())
 			retryCount++
 			continue
 		}
 		c.WS.Listen()
-		c.LogError("WebSocket Reconnected")
+		c.LogInfo("WebSocket Reconnected")
 		break
 	}
 }
