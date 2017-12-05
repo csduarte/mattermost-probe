@@ -160,13 +160,13 @@ func (c *Client) CreatePost(post *model.Post) error {
 // LogError is helper for error logging
 func (c *Client) LogError(format string, args ...interface{}) {
 	if c.Log != nil {
-		c.Log.Errorf(format, args)
+		c.Log.Errorf(format, args...)
 	}
 }
 
 // LogInfo is a helper for info logging
 func (c *Client) LogInfo(format string, args ...interface{}) {
 	if c.Log != nil {
-		c.Log.Infof(format, args)
+		c.Log.Infof(format, args...)
 	}
 }
