@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/csduarte/mattermost-probe/config"
@@ -17,8 +19,17 @@ import (
 )
 
 func main() {
+
+	var osSignal = make(chan os.Signal)
+	signal.Notify(osSignal, syscall.SIGTERM)
+	signal.Notify(osSignal, syscall.SIGINT)
+
 	applicationStart()
-	select {}
+
+	select {
+	case sig := <-osSignal:
+		log.Printf("Application closing from sig %s", sig)
+	}
 }
 
 func applicationStart() {
