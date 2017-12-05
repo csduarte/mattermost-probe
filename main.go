@@ -33,7 +33,6 @@ func main() {
 }
 
 func applicationStart() {
-	//TODO: Add PID check for multiple process
 
 	flagConfig := config.GetFlags()
 
@@ -96,10 +95,10 @@ func applicationStart() {
 
 	probes := probe.NewProbes(cfg, server.ReportChannel, c1, c2)
 	if err := probe.SetupProbes(probes, log); err != nil {
-		applicationExit(log, err.Error())
+		applicationExit(log, "Failed to setup probes - %s", err.Error())
 	}
 	if err := probe.StartProbes(probes, log); err != nil {
-		applicationExit(log, err.Error())
+		applicationExit(log, "Failed to start probes - %s", err.Error())
 	}
 	if len(probes) == 0 {
 		log.Warn("No probes enabled.")

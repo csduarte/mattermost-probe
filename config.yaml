@@ -1,6 +1,6 @@
 host: http://localhost:8065
 ws_host: ws://localhost:8065
-team_id: hh69e8jsgidnikmqhmtp3kughr
+team_id: fjbn9g8u9b84jeuq18y7rf39ka
 bind_address: 127.0.0.1
 port: 8067
 
@@ -39,13 +39,11 @@ search_probe:
   user_enabled: true 
   user_minimum: 1
   user_terms:
-    - dchristopher
-    - test
-  channel_enabled: true 
-  channel_minimum: 0
+    - probe2
+  channel_enabled: false 
+  channel_minimum: 1
   channel_terms:
-    - AChannelThePrbeIsNotAMember
-    - test
+    - AChannelThatTheProbeIsNotAMember
 
 api_ping_probe:
   enabled: true
