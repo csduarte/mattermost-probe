@@ -24,15 +24,16 @@ func main() {
 	signal.Notify(osSignal, syscall.SIGTERM)
 	signal.Notify(osSignal, syscall.SIGINT)
 
-	applicationStart()
+	stop := applicationStart()
 
 	select {
 	case sig := <-osSignal:
 		log.Printf("Application closing from sig %s", sig)
+		stop()
 	}
 }
 
-func applicationStart() {
+func applicationStart() func() {
 
 	flagConfig := config.GetFlags()
 
@@ -93,7 +94,9 @@ func applicationStart() {
 		applicationExit(log, "Could not establish client 2 - %s", err.Error())
 	}
 
-	probes := probe.NewProbes(cfg, server.ReportChannel, c1, c2)
+	c3 := mattermost.NewClient(cfg.Host, cfg.TeamID, server.ReportChannel, log)
+
+	probes := probe.NewProbes(cfg, server.ReportChannel, c1, c2, c3)
 	if err := probe.SetupProbes(probes, log); err != nil {
 		applicationExit(log, "Failed to setup probes - %s", err.Error())
 	}
@@ -104,6 +107,12 @@ func applicationStart() {
 		log.Warn("No probes enabled.")
 	} else {
 		log.Info("Application running")
+	}
+
+	return func() {
+		c1.Logout()
+		c2.Logout()
+		c3.Logout()
 	}
 }
 
