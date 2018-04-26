@@ -74,7 +74,7 @@ func (c *Client) PingAPI() error {
 	return nil
 }
 
-// Login will the login endpoint
+// Login will call the login endpoint
 func (c *Client) Login(creds config.Credentials) error {
 	results, err := c.API.Login(creds.Email, creds.Password)
 	if err != nil {
@@ -85,6 +85,20 @@ func (c *Client) Login(creds config.Credentials) error {
 		return fmt.Errorf("Login could not extract channel user data from response")
 	}
 	c.User = data
+	return nil
+}
+
+// Logout will call the logout endpoint
+func (c *Client) Logout() error {
+	results, err := c.API.Logout()
+	if err != nil {
+		return err
+	}
+	_, ok := results.Data.(*model.User)
+	if !ok {
+		return fmt.Errorf("Logout could not extract user data from response")
+	}
+
 	return nil
 }
 
