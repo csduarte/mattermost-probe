@@ -18,7 +18,7 @@ type Probe interface {
 }
 
 // NewProbes takes configs, report channel and the client objects and creates each probe.
-func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Client) []Probe {
+func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2, c3 *mattermost.Client) []Probe {
 	probes := []Probe{}
 	if cfg.BroadcastProbe.Enabled {
 		p := NewBroadcastProbe(cfg.BroadcastProbe, c1, c2)
@@ -43,7 +43,7 @@ func NewProbes(cfg config.Config, rc chan metrics.Report, c1, c2 *mattermost.Cli
 	}
 
 	if cfg.LoginProbe.Enabled {
-		p := NewLoginProbe(cfg.LoginProbe, c1, cfg.UserA)
+		p := NewLoginProbe(cfg.LoginProbe, c3, cfg.UserA)
 		probes = append(probes, p)
 	}
 

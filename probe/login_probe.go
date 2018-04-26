@@ -66,9 +66,10 @@ func (p *LoginProbe) Start() error {
 	return nil
 }
 
-// Login will fire off a attempt to auth against server, errors are caught by transport layer
+// Login will fire off an attempt to auth against server, errors are caught by transport layer
 func (p *LoginProbe) Login() {
 	p.Client.Login(p.Credentials)
+	p.Client.Logout()
 }
 
 func (p *LoginProbe) String() string {

@@ -16,6 +16,7 @@ type APIClient struct {
 type APIInterface interface {
 	GetPing() (map[string]string, *model.AppError)
 	Login(string, string) (*model.Result, *model.AppError)
+	Logout() (*model.Result, *model.AppError)
 	GetChannelByName(string) (*model.Result, *model.AppError)
 	JoinChannel(string) (*model.Result, *model.AppError)
 	GetFile(string) (io.ReadCloser, *model.AppError)
