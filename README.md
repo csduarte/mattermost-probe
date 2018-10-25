@@ -8,7 +8,9 @@ users and channels.
 
 - Message Broadcast
 - Message Receive
-- Index Page (Unauthenticated)
-- Index Page (Authenticated)
+- Ping Index Page (Unauthenticated)
+- Ping Index Page (Authenticated)
 - Search User
 - Search Channel
+- Channel Join
+- Login and Logout
